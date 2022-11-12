@@ -9,7 +9,7 @@ Sure, I suppose so.
 I'll warn you though, I'm a bit territorial, so I may not be so fast to accept any pull requests.
 
 ## Why did I make this?
-Cause I got bored of Psych and I wanted to test myself.
+Cause I got bored of Psych and wanted to test myself.
 
 ## What's with the name?
 Because...
