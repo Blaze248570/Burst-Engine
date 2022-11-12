@@ -13,7 +13,7 @@ Cause I got bored of Psych and I wanted to test myself.
 ## What's with the name?
 Because...
 
-# ♪EEVEE♪
+# EEVEE
                                                       |
                                                      /|
                                                    ,' |
