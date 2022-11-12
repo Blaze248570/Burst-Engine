@@ -1,8 +1,8 @@
 package;
 
+import flixel.FlxG;
 import flixel.FlxGame;
 import flixel.FlxState;
-import openfl.Assets;
 import openfl.Lib;
 import openfl.display.FPS;
 import openfl.display.Sprite;
@@ -71,6 +71,10 @@ class Main extends Sprite
 
 		#if !mobile
 		addChild(new FPS(10, 3, 0xFFFFFF));
+		#end
+
+		#if desktop
+		FlxG.autoPause = false;
 		#end
 	}
 }

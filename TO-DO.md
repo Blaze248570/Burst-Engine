@@ -1,6 +1,7 @@
 ## Things to create
 - ~~git repository~~
 - Character editor of some sort
+- An options menu cause the current one doesn't do anything???
 
 ## Bugs to address
 - ♪ All good ♪
@@ -11,3 +12,7 @@
 
 ## Risks
 - Memory leaks (just in case)
+
+
+### Notes:
+- PlayState: Line 1879
