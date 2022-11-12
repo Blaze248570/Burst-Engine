@@ -5,7 +5,7 @@ Pretty much nothing. I'm just making an engine for my own personal use.
 If you want to use it, that's cool. However, I'd suggest just sticking with Psych.
 
 ## Can I contribute?
-Sure, I suppose so.   
+Sure, I suppose so.  
 I'll warn you though, I'm a bit territorial, so I may not be so fast to accept any pull requests.
 
 ## Why did I make this?
@@ -50,3 +50,4 @@ Because...
                                                    |     /
                                                    |   ,'
                                                     `""
+(That's my Eevee ^~^)
