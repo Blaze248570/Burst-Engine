@@ -50,4 +50,4 @@ Because...
                                                    |     /
                                                    |   ,'
                                                     `""
-(That's my Eevee ^~^)
+(Burst was my Eevee ^~^)
