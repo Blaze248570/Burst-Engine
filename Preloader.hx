@@ -1,17 +1,13 @@
 package ;
- 
-import flixel.system.FlxBasePreloader;
-import openfl.display.Sprite;
+
 import flash.display.Bitmap;
 import flash.display.BitmapData;
-import flash.display.BlendMode;
 import flash.display.Sprite;
 import flash.Lib;
-import flixel.FlxG;
  
 @:bitmap("art/preloaderArt.png") class LogoImage extends BitmapData { }
  
-class Preloader extends FlxBasePreloader
+class Preloader extends flixel.system.FlxBasePreloader
 {
     public function new(MinDisplayTime:Float=3, ?AllowedURLs:Array<String>) 
     {
@@ -33,7 +29,7 @@ class Preloader extends FlxBasePreloader
         logo.x = ((this._width) / 2) - ((logo.width) / 2);
         logo.y = (this._height / 2) - ((logo.height) / 2);
         addChild(logo); //Adds the graphic to the NMEPreloader's buffer.
-         
+        
         super.create();
     }
      
