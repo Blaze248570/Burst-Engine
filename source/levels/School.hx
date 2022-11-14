@@ -1,10 +1,13 @@
 package levels;
 
+import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.addons.effects.FlxTrail;
-import flixel.addons.effects.FlxTrailArea;
-import flixel.addons.effects.chainable.FlxEffectSprite;
+// import flixel.addons.effects.FlxTrail;
+// import flixel.addons.effects.FlxTrailArea;
+// import flixel.addons.effects.chainable.FlxEffectSprite;
 import flixel.addons.effects.chainable.FlxWaveEffect;
+import flixel.util.FlxColor;
+import flixel.util.FlxTimer;
 
 //import WiggleEffect.WiggleEffectType;
 
@@ -15,6 +18,7 @@ class School extends PlayState
 
     override public function createStage() {
         var curSong:String = Paths.formatToSongPath(PlayState.SONG.song);
+        PlayState.isPixelLevel = true;
 
         if(curSong == "thorns") {
             PlayState.curStage = 'schoolEvil';
@@ -136,6 +140,112 @@ class School extends PlayState
         }
 
         createCharacters();
+    }
+
+    override function startCutscene() {
+        var doof:DialogueBox = new DialogueBox(false, dialogue);
+		// doof.x += 70;
+		// doof.y = FlxG.height * 0.5;
+		doof.scrollFactor.set();
+		doof.finishThing = startCountdown;
+		doof.cameras = [camHUD];
+
+		switch (curSong.toLowerCase())
+		{
+			case 'senpai':
+				schoolIntro(doof);
+			case 'roses':
+				FlxG.sound.play(Paths.sound('ANGRY'));
+				schoolIntro(doof);
+			case 'thorns':
+				schoolIntro(doof);
+			default:
+				startCountdown();
+		}
+    }
+
+    function schoolIntro(?dialogueBox:DialogueBox):Void
+    {
+        var black:FlxSprite = new FlxSprite(-100, -100).makeGraphic(FlxG.width * 2, FlxG.height * 2, FlxColor.BLACK);
+        black.scrollFactor.set();
+        add(black);
+
+        var red:FlxSprite = new FlxSprite(-100, -100).makeGraphic(FlxG.width * 2, FlxG.height * 2, 0xFFff1b31);
+        red.scrollFactor.set();
+
+        var senpaiEvil:FlxSprite = new FlxSprite();
+        senpaiEvil.frames = Paths.getSparrowAtlas('weeb/senpaiCrazy');
+        senpaiEvil.animation.addByPrefix('idle', 'Senpai Pre Explosion', 24, false);
+        senpaiEvil.setGraphicSize(Std.int(senpaiEvil.width * 6));
+        senpaiEvil.scrollFactor.set();
+        senpaiEvil.updateHitbox();
+        senpaiEvil.screenCenter();
+
+        if (curSong == 'roses' || curSong== 'thorns')
+        {
+            remove(black);
+
+            if (curSong == 'thorns')
+            {
+                add(red);
+            }
+        }
+
+        new FlxTimer().start(0.3, function(tmr:FlxTimer)
+        {
+            black.alpha -= 0.15;
+
+            if (black.alpha > 0)
+            {
+                tmr.reset(0.3);
+            }
+            else
+            {
+                if (dialogueBox != null)
+                {
+                    inCutscene = true;
+
+                    if (curSong == 'thorns')
+                    {
+                        add(senpaiEvil);
+                        senpaiEvil.alpha = 0;
+                        new FlxTimer().start(0.3, function(swagTimer:FlxTimer)
+                        {
+                            senpaiEvil.alpha += 0.15;
+                            if (senpaiEvil.alpha < 1)
+                            {
+                                swagTimer.reset();
+                            }
+                            else
+                            {
+                                senpaiEvil.animation.play('idle');
+                                FlxG.sound.play(Paths.sound('Senpai_Dies'), 1, false, null, true, function()
+                                {
+                                    remove(senpaiEvil);
+                                    remove(red);
+                                    FlxG.camera.fade(FlxColor.WHITE, 0.01, true, function()
+                                    {
+                                        add(dialogueBox);
+                                    }, true);
+                                });
+                                new FlxTimer().start(3.2, function(deadTime:FlxTimer)
+                                {
+                                    FlxG.camera.fade(FlxColor.WHITE, 1.6, false);
+                                });
+                            }
+                        });
+                    }
+                    else
+                    {
+                        add(dialogueBox);
+                    }
+                } else {
+                    startCountdown();
+                }
+
+                remove(black);
+            }
+        });
     }
 
     override public function beatHit() {
