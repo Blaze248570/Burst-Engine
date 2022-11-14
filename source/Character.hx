@@ -405,7 +405,7 @@ class Character extends flixel.FlxSprite
 	/**
 	 * FOR GF DANCING SHIT
 	 */
-	private var danced:Bool = false;
+	public var danced:Bool = false;
 	private var danceIdle:Bool = false;
 	public function dance()
 	{

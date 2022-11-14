@@ -10,6 +10,7 @@
 - Improve chart editor to not be a giant mess
 - Improve asset caching to run smoother
 - ~~Character processing~~
+- Note processing
 
 ## Things to finish
 - Reprogramming each character to match the new style
@@ -18,4 +19,5 @@
 - Memory leaks (just in case)
 
 ### Notes:
+- FreeplayState: Line 230
 - PlayState: Line 1879
