@@ -2,14 +2,14 @@ package levels;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
-// import flixel.addons.effects.FlxTrail;
+import flixel.addons.effects.FlxTrail;
 // import flixel.addons.effects.FlxTrailArea;
 // import flixel.addons.effects.chainable.FlxEffectSprite;
 import flixel.addons.effects.chainable.FlxWaveEffect;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 
-//import WiggleEffect.WiggleEffectType;
+// import WiggleEffect.WiggleEffectType;
 
 class School extends PlayState 
 {
@@ -18,7 +18,10 @@ class School extends PlayState
 
     override public function createStage() {
         var curSong:String = Paths.formatToSongPath(PlayState.SONG.song);
+
         PlayState.isPixelLevel = true;
+        BF_POS.set(970, 320);
+        GF_POS.set(580, 430);
 
         if(curSong == "thorns") {
             PlayState.curStage = 'schoolEvil';
@@ -140,6 +143,20 @@ class School extends PlayState
         }
 
         createCharacters();
+    }
+
+    override public function createCharacters(bfVersion:String = null, gfVersion:String = null, dadVersion:String = null) {
+        super.createCharacters(bfVersion, gfVersion, dadVersion);
+
+        if(dad.curCharacter == 'spririt') {
+            // trailArea.scrollFactor.set();
+
+            var evilTrail = new FlxTrail(dad, null, 4, 24, 0.3, 0.069);
+            // evilTrail.changeValuesEnabled(false, false, false, false);
+            // evilTrail.changeGraphic()
+            add(evilTrail);
+            // evilTrail.scrollFactor.set(1.1, 1.1);
+        }
     }
 
     override function startCutscene() {

@@ -17,6 +17,9 @@ class Character extends flixel.FlxSprite
 	public var animationData:Array<AnimationData> = null;
 	public var debugMode:Bool = false;
 
+	public var positionArray:Array<Float> = [0, 0];
+	public var cameraPosition:Array<Float> = [0, 0];
+
 	public var isPlayer:Bool = false;
 	public var curCharacter:String = 'bf';
 
@@ -36,6 +39,8 @@ class Character extends flixel.FlxSprite
 		switch (curCharacter)
 		{
 			default:
+				positionArray = [0, 350];
+
 				frames = Paths.getSparrowAtlas('BOYFRIEND');
 				flipX = !isPlayer;
 
@@ -57,6 +62,8 @@ class Character extends flixel.FlxSprite
 					{offsets: [-40, -40], name: "bf pre attack", loop: false, indices: [], fps: 24, anim: 'pre-attack'}
 				];
 			case 'bf-dead':
+				positionArray = [0, 350];
+
 				frames = Paths.getSparrowAtlas('BOYFRIEND_DEAD');
 				flipX = !isPlayer;
 
@@ -67,6 +74,9 @@ class Character extends flixel.FlxSprite
 				];
 
 			case 'bf-christmas':
+				positionArray = [0, 350];
+				cameraPosition = [0, -100];
+
 				frames = Paths.getSparrowAtlas('christmas/bfChristmas');
 				flipX = !isPlayer;
 
@@ -84,6 +94,9 @@ class Character extends flixel.FlxSprite
 				];
 				
 			case 'bf-car':
+				positionArray = [0, 350];
+				cameraPosition = [-200, 0];
+
 				frames = Paths.getSparrowAtlas('bfCar');
 				flipX = !isPlayer;
 
@@ -100,6 +113,10 @@ class Character extends flixel.FlxSprite
 				];
 
 			case 'bf-pixel':
+				positionArray = [0, 350];
+				cameraPosition = [50, -160];
+				// cameraPosition = [-50, -260];
+
 				frames = Paths.getSparrowAtlas('weeb/bfPixel');
 				flipX = !isPlayer;
 				antialiasing = false;
@@ -134,6 +151,9 @@ class Character extends flixel.FlxSprite
 				}
 
 			case 'bf-pixel-dead':
+				positionArray = [0, 350];
+				cameraPosition = [50, -60];
+
 				frames = Paths.getSparrowAtlas('weeb/bfPixelsDEAD');
 				flipX = !isPlayer;
 				antialiasing = false;
@@ -173,6 +193,8 @@ class Character extends flixel.FlxSprite
 				];
 
 			case 'gf-pixel':
+				cameraPosition = [-20, 80];
+
 				frames = Paths.getSparrowAtlas('weeb/gfPixel');
 				antialiasing = false;
 
@@ -196,6 +218,7 @@ class Character extends flixel.FlxSprite
 				];
 
 			case 'spooky':
+				positionArray = [0, 200];
 				frames = Paths.getSparrowAtlas('spooky_kids_assets');
 
 				animationData = [
@@ -208,6 +231,8 @@ class Character extends flixel.FlxSprite
 				];
 			
 			case 'monster' | 'monster-christmas':
+				positionArray = [0, 100];
+
 				frames = Paths.getSparrowAtlas(curCharacter == 'monster-christmas' ? 'christmas/monsterChristmas' : 'Monster_Assets');
 
 				animationData = [
@@ -218,20 +243,8 @@ class Character extends flixel.FlxSprite
 					{anim: 'singRIGHT', name: 'Monster Right note', indices: [], fps: 24, loop: false, offsets: [-51, 0]},
 				];
 
-			case 'mom' | 'mom-car':
-				frames = Paths.getSparrowAtlas(curCharacter == 'mom-car' ? 'momCar' : 'Mom_Assets');
-
-				animationData = [
-					{anim: 'idle', name: 'Mom Idle', indices: [], fps: 24, loop: false, offsets: [0, 0]},
-					{anim: 'singLEFT', name: 'Mom Left Pose', indices: [], fps: 24, loop: false, offsets: [250, -23]},
-					{anim: 'singDOWN', name: 'MOM DOWN POSE', indices: [], fps: 24, loop: false, offsets: [20, -160]},
-					{anim: 'singUP', name: 'Mom Up Pose', indices: [], fps: 24, loop: false, offsets: [14, 71]},
-					// ANIMATION IS CALLED MOM LEFT POSE BUT ITS FOR THE RIGHT
-					// CUZ DAVE IS DUMB!
-					{anim: 'singRIGHT', name: 'Mom Pose Left', indices: [], fps: 24, loop: false, offsets: [10, -60]},
-				];
-
 			case 'pico':
+				positionArray = [0, 300];
 				frames = Paths.getSparrowAtlas('Pico_FNF_assetss');
 				flipX = !isPlayer;
 
@@ -260,7 +273,22 @@ class Character extends flixel.FlxSprite
 						{anim: 'singRIGHTmiss', name: 'Pico Note Right Miss', fps: 24, loop: false, indices: [], offsets: [-45, 50]}
 					];
 				}
+
+			case 'mom' | 'mom-car':
+				frames = Paths.getSparrowAtlas(curCharacter == 'mom-car' ? 'momCar' : 'Mom_Assets');
+
+				animationData = [
+					{anim: 'idle', name: 'Mom Idle', indices: [], fps: 24, loop: false, offsets: [0, 0]},
+					{anim: 'singLEFT', name: 'Mom Left Pose', indices: [], fps: 24, loop: false, offsets: [250, -23]},
+					{anim: 'singDOWN', name: 'MOM DOWN POSE', indices: [], fps: 24, loop: false, offsets: [20, -160]},
+					{anim: 'singUP', name: 'Mom Up Pose', indices: [], fps: 24, loop: false, offsets: [14, 71]},
+					// ANIMATION IS CALLED MOM LEFT POSE BUT ITS FOR THE RIGHT
+					// CUZ DAVE IS DUMB!
+					{anim: 'singRIGHT', name: 'Mom Pose Left', indices: [], fps: 24, loop: false, offsets: [10, -60]},
+				];
+
 			case 'parents-christmas':
+				positionArray = [-500, 0];
 				frames = Paths.getSparrowAtlas('christmas/mom_dad_christmas_assets');
 
 				animationData = [
@@ -276,6 +304,8 @@ class Character extends flixel.FlxSprite
 				];
 			
 			case 'senpai' | 'senpai-angry':
+				positionArray = [150, 360];
+				cameraPosition = [-240, -330];
 				frames = Paths.getSparrowAtlas('weeb/senpai');
 				antialiasing = false;
 	
@@ -302,6 +332,8 @@ class Character extends flixel.FlxSprite
 				) ;
 
 			case 'spirit':
+				positionArray = [-150, 100];
+
 				frames = Paths.getPackerAtlas('weeb/spirit');
 				antialiasing = false;
 

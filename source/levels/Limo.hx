@@ -15,6 +15,7 @@ class Limo extends PlayState {
     override public function createStage() {
         PlayState.curStage = 'limo';
         defaultCamZoom = 0.9;
+        BF_POS.set(1030, -120);
 
         add(new BGSprite('limo/limoSunset', -120, -50, 0.1, 0.1));
 

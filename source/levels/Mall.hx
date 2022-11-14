@@ -16,6 +16,10 @@ class Mall extends PlayState
     override public function createStage() {
         if(Paths.formatToSongPath(PlayState.SONG.song) == 'winter-horrorland') {
             PlayState.curStage = 'mallEvil';
+
+            BF_POS.set(1090, 100);
+            DAD_POS.set(100, 20);
+
             var bg:BGSprite = new BGSprite('christmas/evilBG', -400, -500, 0.2, 0.2);
             bg.antialiasing = true;
             bg.setGraphicSize(Std.int(bg.width * 0.8));
@@ -33,6 +37,7 @@ class Mall extends PlayState
             PlayState.curStage = 'mall';
 
             defaultCamZoom = 0.80;
+            BF_POS.set(970, 100);
 
             var bg:BGSprite = new BGSprite('christmas/bgWalls', -1000, -500, 0.2, 0.2);
             bg.antialiasing = true;

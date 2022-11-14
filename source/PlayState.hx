@@ -11,9 +11,9 @@ import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.FlxSubState;
-import flixel.addons.effects.FlxTrail;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.group.FlxSpriteGroup;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
@@ -39,9 +39,14 @@ class PlayState extends MusicBeatState
 
 	private var vocals:FlxSound;
 
-	private var dad:Character;
+	// Sorta psychy right now, but these'll change
+	private var bfGroup:FlxSpriteGroup;
+	private var gfGroup:FlxSpriteGroup;
+	private var dadGroup:FlxSpriteGroup;
+	
 	private var gf:Character;
 	private var boyfriend:Boyfriend;
+	private var dad:Character;
 
 	private var notes:FlxTypedGroup<Note>;
 	private var unspawnNotes:Array<Note> = [];
@@ -50,7 +55,6 @@ class PlayState extends MusicBeatState
 	private var curSection:Int = 0;
 
 	private var camFollow:FlxObject;
-
 	private static var prevCamFollow:FlxObject;
 
 	private var strumLineNotes:FlxTypedGroup<FlxSprite>;
@@ -269,105 +273,74 @@ class PlayState extends MusicBeatState
         createCharacters();
 	 }
 
+	var BF_POS:FlxPoint = new FlxPoint(770, 100);
+	var GF_POS:FlxPoint = new FlxPoint(400, 130);
+	var DAD_POS:FlxPoint = new FlxPoint(100, 100);
+
 	/**
 		Function meant for subclasses to override when placing characters.
 
 		TO DO: Make this sexier
 	 */ 
-	function createCharacters() {
-		var gfVersion:String = 'gf';
+	function createCharacters(bfVersion:String = null, gfVersion:String = null, dadVersion:String = null) {
+		if(bfVersion == null)
+			bfVersion = SONG.player1;
 
-		switch (curStage)
-		{
-			case 'limo':
-				gfVersion = 'gf-car';
-			case 'mall' | 'mallEvil':
-				gfVersion = 'gf-christmas';
-			case 'school' | 'schoolEvil':
-				gfVersion = 'gf-pixel';
+		if(gfVersion == null)
+			switch (curStage)
+			{
+				case 'limo':
+					gfVersion = 'gf-car';
+				case 'mall' | 'mallEvil':
+					gfVersion = 'gf-christmas';
+				case 'school' | 'schoolEvil':
+					gfVersion = 'gf-pixel';
+				default:
+					gfVersion = 'gf';
+			}
+
+		if(dadVersion == null)
+			dadVersion = SONG.player2;
+
+		gfGroup = new FlxSpriteGroup(GF_POS.x, GF_POS.y);
+		dadGroup = new FlxSpriteGroup(DAD_POS.x, DAD_POS.y);
+		bfGroup = new FlxSpriteGroup(BF_POS.x, BF_POS.y);
+
+		// NOTE: Implement this at some point
+		// if(!hideGirlfriend) {
+			gf = new Character(0, 0, gfVersion);
+			gf.setPosition(gf.positionArray[0], gf.positionArray[1]);
+			gf.scrollFactor.set(0.95, 0.95);
+			gfGroup.add(gf);
+		// }
+
+		dad = new Character(0, 0, dadVersion);
+		dad.setPosition(dad.positionArray[0], dad.positionArray[1]);
+		dadGroup.add(dad);
+
+		boyfriend = new Boyfriend(0, 0, bfVersion);
+		boyfriend.setPosition(boyfriend.positionArray[0], boyfriend.positionArray[1]);
+		bfGroup.add(boyfriend);
+
+		var camPos:FlxPoint = new FlxPoint(FlxG.width / 2, FlxG.height / 2);
+		if(gf == null) {
+			switch(curStage) {
+				// This'd be for a time when there's no gf... which is never..... yet
+			}
+		} else {
+			camPos.x = gf.getGraphicMidpoint().x + gf.cameraPosition[0];
+			camPos.y = gf.getGraphicMidpoint().y + gf.cameraPosition[1];
 		}
 
-		if (curStage == 'limo')
-			gfVersion = 'gf-car';
-
-		gf = new Character(400, 130, gfVersion);
-		gf.scrollFactor.set(0.95, 0.95);
-
-		dad = new Character(100, 100, SONG.player2);
-
-		var camPos:FlxPoint = new FlxPoint(dad.getGraphicMidpoint().x, dad.getGraphicMidpoint().y);
-
-		switch (SONG.player2)
+		switch (dadVersion)
 		{
 			case 'gf':
 				dad.setPosition(gf.x, gf.y);
 				gf.visible = false;
-				if (isStoryMode)
-				{
+				if (isStoryMode) {
 					camPos.x += 600;
 					tweenCamIn();
 				}
-
-			case "spooky":
-				dad.y += 200;
-			case "monster":
-				dad.y += 100;
-			case 'monster-christmas':
-				dad.y += 130;
-			case 'dad':
-				camPos.x += 400;
-			case 'pico':
-				camPos.x += 600;
-				dad.y += 300;
-			case 'parents-christmas':
-				dad.x -= 500;
-			case 'senpai':
-				dad.x += 150;
-				dad.y += 360;
-				camPos.set(dad.getGraphicMidpoint().x + 300, dad.getGraphicMidpoint().y);
-			case 'senpai-angry':
-				dad.x += 150;
-				dad.y += 360;
-				camPos.set(dad.getGraphicMidpoint().x + 300, dad.getGraphicMidpoint().y);
-			case 'spirit':
-				dad.x -= 150;
-				dad.y += 100;
-				camPos.set(dad.getGraphicMidpoint().x + 300, dad.getGraphicMidpoint().y);
-		}
-
-		boyfriend = new Boyfriend(770, 450, SONG.player1);
-
-		// REPOSITIONING PER STAGE
-		switch (curStage)
-		{
-			case 'limo':
-				boyfriend.y -= 220;
-				boyfriend.x += 260;
-
-			case 'mall':
-				boyfriend.x += 200;
-
-			case 'mallEvil':
-				boyfriend.x += 320;
-				dad.y -= 80;
-			case 'school':
-				boyfriend.x += 200;
-				boyfriend.y += 220;
-				gf.x += 180;
-				gf.y += 300;
-			case 'schoolEvil':
-				// trailArea.scrollFactor.set();
-
-				var evilTrail = new FlxTrail(dad, null, 4, 24, 0.3, 0.069);
-				// evilTrail.changeValuesEnabled(false, false, false, false);
-				// evilTrail.changeGraphic()
-				add(evilTrail);
-				// evilTrail.scrollFactor.set(1.1, 1.1);
-
-				boyfriend.x += 200;
-				boyfriend.y += 220;
-				gf.x += 180;
-				gf.y += 300;
 		}
 
 		add(gf);
