@@ -95,7 +95,7 @@ class Character extends flixel.FlxSprite
 				
 			case 'bf-car':
 				positionArray = [0, 350];
-				cameraPosition = [-200, 0];
+				cameraPosition = [200, 0];
 
 				frames = Paths.getSparrowAtlas('bfCar');
 				flipX = !isPlayer;
@@ -114,8 +114,7 @@ class Character extends flixel.FlxSprite
 
 			case 'bf-pixel':
 				positionArray = [0, 350];
-				cameraPosition = [50, -160];
-				// cameraPosition = [-50, -260];
+				cameraPosition = [50, -60];
 
 				frames = Paths.getSparrowAtlas('weeb/bfPixel');
 				flipX = !isPlayer;
