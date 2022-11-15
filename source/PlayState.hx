@@ -54,8 +54,11 @@ class PlayState extends MusicBeatState
 	private var strumLine:FlxSprite;
 	private var curSection:Int = 0;
 
-	private var camFollow:FlxObject;
-	private static var prevCamFollow:FlxObject;
+	// Credit to ShadowMario for the new epic mega sexy cam code that he's done
+	public var camFollow:FlxPoint;
+	public var camFollowPos:FlxObject;
+	private static var prevCamFollow:FlxPoint;
+	private static var prevCamFollowPos:FlxObject;
 
 	private var strumLineNotes:FlxTypedGroup<FlxSprite>;
 	private var playerStrums:FlxTypedGroup<FlxSprite>;
@@ -77,6 +80,7 @@ class PlayState extends MusicBeatState
 	private var iconP2:HealthIcon;
 	private var camHUD:FlxCamera;
 	private var camGame:FlxCamera;
+	public var cameraSpeed:Float = 1; // This'll just stay one for now
 
 	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
 
@@ -347,22 +351,32 @@ class PlayState extends MusicBeatState
 		add(dad);
 		add(boyfriend);
 
-		camFollow = new FlxObject(0, 0, 1, 1);
+		camFollow = new FlxPoint();
+		camFollowPos = new FlxObject(0, 0, 1, 1);
 
-		camFollow.setPosition(camPos.x, camPos.y);
-
+		snapCamFollowToPos(camPos.x, camPos.y);
 		if (prevCamFollow != null)
 		{
 			camFollow = prevCamFollow;
 			prevCamFollow = null;
 		}
+		if (prevCamFollowPos != null)
+		{
+			camFollowPos = prevCamFollowPos;
+			prevCamFollowPos = null;
+		}
+		add(camFollowPos);
 
-		add(camFollow);
-
-		FlxG.camera.follow(camFollow, LOCKON, 0.04);
+		FlxG.camera.follow(camFollowPos, LOCKON, 1);
 		// FlxG.camera.setScrollBounds(0, FlxG.width, 0, FlxG.height);
 		FlxG.camera.zoom = defaultCamZoom;
-		FlxG.camera.focusOn(camFollow.getPosition());
+		FlxG.camera.focusOn(camFollow);
+
+		FlxG.worldBounds.set(0, 0, FlxG.width, FlxG.height);
+
+		// NOTE: Make sure this isn't a liability
+		FlxG.fixedTimestep = false;
+		// moveCameraSection();
 	}
 
 	function generateHUD() {
@@ -743,6 +757,29 @@ class PlayState extends MusicBeatState
 
 	// Camera related functions
 
+	// This really isn't of much use at the moment
+	/*
+		function moveCameraSection():Void {
+			if(SONG.notes[curSection] == null) return;
+
+			
+			if (gf != null && SONG.notes[curSection].gfSection) {
+				camFollow.set(gf.getMidpoint().x, gf.getMidpoint().y);
+				camFollow.x += gf.cameraPosition[0] + girlfriendCameraOffset[0];
+				camFollow.y += gf.cameraPosition[1] + girlfriendCameraOffset[1];
+				tweenCamIn();
+				callOnLuas('onMoveCamera', ['gf']);
+				return;
+			}
+			
+
+			if (!SONG.notes[curSection].mustHitSection)
+				moveCamera(true);
+			else
+				moveCamera(false);
+		}
+	*/
+
 	var cameraTwn:FlxTween;
 	/**
 		Function to swap the perspective when switching sections
@@ -754,16 +791,16 @@ class PlayState extends MusicBeatState
 	function moveCamera(isDad:Bool = false) {
 		if(isDad)
 		{
-			camFollow.setPosition(dad.getMidpoint().x + 150, dad.getMidpoint().y - 100);
-			camFollow.x += dad.cameraPosition[0];
-			camFollow.y += dad.cameraPosition[1];
+			camFollow.set(dad.getMidpoint().x + 150, dad.getMidpoint().y - 100);
+			camFollow.x += dad.cameraPosition[0];// + opponentCameraOffset[0];
+			camFollow.y += dad.cameraPosition[1]; //+ opponentCameraOffset[1];
 			tweenCamIn();
 		}
 		else
 		{
-			camFollow.setPosition(boyfriend.getMidpoint().x - 100, boyfriend.getMidpoint().y - 100);
-			camFollow.x -= boyfriend.cameraPosition[0];
-			camFollow.y += boyfriend.cameraPosition[1];
+			camFollow.set(boyfriend.getMidpoint().x - 100, boyfriend.getMidpoint().y - 100);
+			camFollow.x -= boyfriend.cameraPosition[0];// - boyfriendCameraOffset[0];
+			camFollow.y += boyfriend.cameraPosition[1];// + boyfriendCameraOffset[1];
 
 			if (Paths.formatToSongPath(SONG.song) == 'tutorial' && cameraTwn == null && FlxG.camera.zoom != 1)
 			{
@@ -786,6 +823,11 @@ class PlayState extends MusicBeatState
 				}
 			});
 		}
+	}
+
+	function snapCamFollowToPos(x:Float, y:Float) {
+		camFollow.set(x, y);
+		camFollowPos.setPosition(x, y);
 	}
 
 	override function openSubState(SubState:FlxSubState)
@@ -883,6 +925,11 @@ class PlayState extends MusicBeatState
 		#if !debug
 		perfectMode = false;
 		#end
+
+		if(!inCutscene) {
+			var lerpVal:Float = CoolUtil.boundTo(elapsed * 2.4 * cameraSpeed, 0, 1);
+			camFollowPos.setPosition(FlxMath.lerp(camFollowPos.x, camFollow.x, lerpVal), FlxMath.lerp(camFollowPos.y, camFollow.y, lerpVal));
+		}
 
 		if (FlxG.keys.justPressed.NINE)
 		{
@@ -1293,7 +1340,9 @@ class PlayState extends MusicBeatState
 
 				FlxTransitionableState.skipNextTransIn = true;
 				FlxTransitionableState.skipNextTransOut = true;
+
 				prevCamFollow = camFollow;
+				prevCamFollowPos = camFollowPos;
 
 				PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + difficulty, PlayState.storyPlaylist[0]);
 				FlxG.sound.music.stop();

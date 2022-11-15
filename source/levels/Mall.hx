@@ -95,7 +95,7 @@ class Mall extends PlayState
 					FlxG.sound.play(Paths.sound('Lights_Turn_On'));
 					camFollow.y = -2050;
 					camFollow.x += 200;
-					FlxG.camera.focusOn(camFollow.getPosition());
+					FlxG.camera.focusOn(camFollow);
 					FlxG.camera.zoom = 1.5;
 
 					new FlxTimer().start(0.8, function(tmr:FlxTimer)
