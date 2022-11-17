@@ -82,7 +82,7 @@ class PlayState extends MusicBeatState
 	private var camGame:FlxCamera;
 	public var cameraSpeed:Float = 1; // This'll just stay one for now
 
-	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
+	var dialogue:Array<String> = ['blah blah blah.', 'coolswag'];
 
 	var talking:Bool = true;
 	var songScore:Int = 0;
