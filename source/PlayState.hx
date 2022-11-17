@@ -54,7 +54,7 @@ class PlayState extends MusicBeatState
 	private var strumLine:FlxSprite;
 	private var curSection:Int = 0;
 
-	// Credit to ShadowMario for the new epic mega sexy cam code that he's done
+	// Credit to ShadowMario for the epic mega sexy cam code that he did
 	public var camFollow:FlxPoint;
 	public var camFollowPos:FlxObject;
 	private static var prevCamFollow:FlxPoint;
@@ -82,7 +82,7 @@ class PlayState extends MusicBeatState
 	private var camGame:FlxCamera;
 	public var cameraSpeed:Float = 1; // This'll just stay one for now
 
-	var dialogue:Array<String> = ['blah blah blah.', 'coolswag'];
+	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
 
 	var talking:Bool = true;
 	var songScore:Int = 0;
