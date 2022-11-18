@@ -13,7 +13,7 @@
 - Note processing
 
 ## Things to finish
-- Reprogramming each character to match the new style
+- ~~Reprogramming each character to match the new style~~
 
 ## Risks
 - Memory leaks (just in case)

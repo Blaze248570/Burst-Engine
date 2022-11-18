@@ -48,7 +48,7 @@ class Limo extends PlayState {
         limo = new BGSprite('limo/limoDrive', -120, 550, 1.0, 1.0, ["Limo stage"], true);
         limo.animation.play('Limo stage');
         limo.antialiasing = true;
-        insert(members.indexOf(dad), limo);
+        insert(members.indexOf(rival), limo);
 
         fastCar = new BGSprite('limo/fastCarLol', -300, 160);
         resetFastCar();

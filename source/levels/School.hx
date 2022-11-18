@@ -26,8 +26,8 @@ class School extends PlayState
         if(curSong == "thorns") {
             PlayState.curStage = 'schoolEvil';
 
-            var waveEffectBG = new FlxWaveEffect(FlxWaveMode.ALL, 2, -1, 3, 2);
-            var waveEffectFG = new FlxWaveEffect(FlxWaveMode.ALL, 2, -1, 5, 2);
+            // var waveEffectBG = new FlxWaveEffect(FlxWaveMode.ALL, 2, -1, 3, 2);
+            // var waveEffectFG = new FlxWaveEffect(FlxWaveMode.ALL, 2, -1, 5, 2);
 
             var posX = 400;
             var posY = 200;
@@ -145,13 +145,13 @@ class School extends PlayState
         createCharacters();
     }
 
-    override public function createCharacters(bfVersion:String = null, gfVersion:String = null, dadVersion:String = null) {
-        super.createCharacters(bfVersion, gfVersion, dadVersion);
+    override public function createCharacters(bfVersion:String = null, gfVersion:String = null, dadVersion:String = null, girlrivalVersion:String = null) {
+        super.createCharacters(bfVersion, gfVersion, dadVersion, null);
 
-        if(dad.curCharacter == 'spririt') {
+        if(rival.curCharacter == 'spririt') {
             // trailArea.scrollFactor.set();
 
-            var evilTrail = new FlxTrail(dad, null, 4, 24, 0.3, 0.069);
+            var evilTrail = new FlxTrail(rival, null, 4, 24, 0.3, 0.069);
             // evilTrail.changeValuesEnabled(false, false, false, false);
             // evilTrail.changeGraphic()
             add(evilTrail);

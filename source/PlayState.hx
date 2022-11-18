@@ -1,5 +1,6 @@
 package;
 
+import characters.*;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -38,15 +39,11 @@ class PlayState extends MusicBeatState
 	public static var storyDifficulty:Int = 1;
 
 	private var vocals:FlxSound;
-
-	// Sorta psychy right now, but these'll change
-	private var bfGroup:FlxSpriteGroup;
-	private var gfGroup:FlxSpriteGroup;
-	private var dadGroup:FlxSpriteGroup;
 	
-	private var gf:Character;
+	private var gf:Girlfriend;
 	private var boyfriend:Boyfriend;
-	private var dad:Character;
+	private var rival:Rival;
+	private var girlrival:Girlrival;
 
 	private var notes:FlxTypedGroup<Note>;
 	private var unspawnNotes:Array<Note> = [];
@@ -54,11 +51,12 @@ class PlayState extends MusicBeatState
 	private var strumLine:FlxSprite;
 	private var curSection:Int = 0;
 
-	// Credit to ShadowMario for the epic mega sexy cam code that he did
+	// Credit to ShadowMario for the epic mega sexy cam code that he did for Psych
 	public var camFollow:FlxPoint;
 	public var camFollowPos:FlxObject;
 	private static var prevCamFollow:FlxPoint;
 	private static var prevCamFollowPos:FlxObject;
+	public var cameraSpeed:Float = 1; // This'll just stay one for now
 
 	private var strumLineNotes:FlxTypedGroup<FlxSprite>;
 	private var playerStrums:FlxTypedGroup<FlxSprite>;
@@ -80,7 +78,7 @@ class PlayState extends MusicBeatState
 	private var iconP2:HealthIcon;
 	private var camHUD:FlxCamera;
 	private var camGame:FlxCamera;
-	public var cameraSpeed:Float = 1; // This'll just stay one for now
+	private var camOther:FlxCamera;
 
 	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
 
@@ -277,55 +275,7 @@ class PlayState extends MusicBeatState
         createCharacters();
 	 }
 
-	var BF_POS:FlxPoint = new FlxPoint(770, 100);
-	var GF_POS:FlxPoint = new FlxPoint(400, 130);
-	var DAD_POS:FlxPoint = new FlxPoint(100, 100);
-
-	/**
-		Function meant for subclasses to override when placing characters.
-
-		TO DO: Make this sexier
-	 */ 
-	function createCharacters(bfVersion:String = null, gfVersion:String = null, dadVersion:String = null) {
-		if(bfVersion == null)
-			bfVersion = SONG.player1;
-
-		if(gfVersion == null)
-			switch (curStage)
-			{
-				case 'limo':
-					gfVersion = 'gf-car';
-				case 'mall' | 'mallEvil':
-					gfVersion = 'gf-christmas';
-				case 'school' | 'schoolEvil':
-					gfVersion = 'gf-pixel';
-				default:
-					gfVersion = 'gf';
-			}
-
-		if(dadVersion == null)
-			dadVersion = SONG.player2;
-
-		gfGroup = new FlxSpriteGroup(GF_POS.x, GF_POS.y);
-		dadGroup = new FlxSpriteGroup(DAD_POS.x, DAD_POS.y);
-		bfGroup = new FlxSpriteGroup(BF_POS.x, BF_POS.y);
-
-		// NOTE: Implement this at some point
-		// if(!hideGirlfriend) {
-			gf = new Character(0, 0, gfVersion);
-			gf.setPosition(gf.positionArray[0], gf.positionArray[1]);
-			gf.scrollFactor.set(0.95, 0.95);
-			gfGroup.add(gf);
-		// }
-
-		dad = new Character(0, 0, dadVersion);
-		dad.setPosition(dad.positionArray[0], dad.positionArray[1]);
-		dadGroup.add(dad);
-
-		boyfriend = new Boyfriend(0, 0, bfVersion);
-		boyfriend.setPosition(boyfriend.positionArray[0], boyfriend.positionArray[1]);
-		bfGroup.add(boyfriend);
-
+	function setUpCameras() {
 		var camPos:FlxPoint = new FlxPoint(FlxG.width / 2, FlxG.height / 2);
 		if(gf == null) {
 			switch(curStage) {
@@ -334,23 +284,17 @@ class PlayState extends MusicBeatState
 		} else {
 			camPos.x = gf.getGraphicMidpoint().x + gf.cameraPosition[0];
 			camPos.y = gf.getGraphicMidpoint().y + gf.cameraPosition[1];
-		}
 
-		switch (dadVersion)
-		{
-			case 'gf':
-				dad.setPosition(gf.x, gf.y);
+			if(rival.curCharacter == 'gf') {
+				rival.setPosition(gf.x, gf.y);
 				gf.visible = false;
 				if (isStoryMode) {
 					camPos.x += 600;
 					tweenCamIn();
 				}
+			}
 		}
-
-		add(gf);
-		add(dad);
-		add(boyfriend);
-
+		
 		camFollow = new FlxPoint();
 		camFollowPos = new FlxObject(0, 0, 1, 1);
 
@@ -374,9 +318,65 @@ class PlayState extends MusicBeatState
 
 		FlxG.worldBounds.set(0, 0, FlxG.width, FlxG.height);
 
-		// NOTE: Make sure this isn't a liability
 		FlxG.fixedTimestep = false;
 		// moveCameraSection();
+	} 
+
+	var BF_POS:FlxPoint = new FlxPoint(770, 100);
+	var GF_POS:FlxPoint = new FlxPoint(400, 130);
+	var RIVAL_POS:FlxPoint = new FlxPoint(100, 100);
+	var GRIVAL_POS:FlxPoint = new FlxPoint(0, 0);
+
+	/**
+		Function meant for subclasses to override when creating characters.
+
+		It is *highly* suggested that `super.createCharacters()` is called.
+		If you do not call super, make sure that `setUpCameras()` is called.
+		@param bfVersion        Set this to override the `SONG.player1` variable
+		@param gfVersion        Set this if you'd like gf to be something other than gf
+		@param rivalVersion     Set this to override the `SONG.player2` variable
+		@param girlrivalVersion Set this to have a second gf which corrospnds to the rival instead of the boyfriend
+	 */ 
+	function createCharacters(bfVersion:String = null, gfVersion:String = null, rivalVersion:String = null, girlrivalVersion:String = null) {
+		if(bfVersion == null)
+			bfVersion = SONG.player1;
+
+		if(gfVersion == null)
+			switch (curStage)
+			{
+				case 'limo':
+					gfVersion = 'gf-car';
+				case 'mall' | 'mallEvil':
+					gfVersion = 'gf-christmas';
+				case 'school' | 'schoolEvil':
+					gfVersion = 'gf-pixel';
+				default:
+					gfVersion = 'gf';
+			}
+
+		if(rivalVersion == null)
+			rivalVersion = SONG.player2;
+
+		rival = new Rival(rival.positionArray[0] + RIVAL_POS.x, rival.positionArray[1] + RIVAL_POS.y, rivalVersion, girlrival);
+
+		if(girlrivalVersion != null) {
+			girlrival = new Girlrival(0, 0, girlrivalVersion, rival);
+			girlrival.setPosition(girlrival.positionArray[0], girlrival.positionArray[1]);
+			rival.girlrival = girlrival;
+		}
+
+		boyfriend = new Boyfriend(boyfriend.positionArray[0] + BF_POS.x, boyfriend.positionArray[1] + BF_POS.y, bfVersion, gf);
+
+		gf = new Girlfriend(gf.positionArray[0] + GF_POS.x, gf.positionArray[1] + GF_POS.y, gfVersion, boyfriend);
+		gf.scrollFactor.set(0.95, 0.95);
+
+		add(gf);
+		if(girlrival != null)
+			add(girlrival);
+		add(rival);
+		add(boyfriend);
+
+		setUpCameras();
 	}
 
 	function generateHUD() {
@@ -442,7 +442,7 @@ class PlayState extends MusicBeatState
 
 		startTimer = new FlxTimer().start(Conductor.crochet / 1000, function(tmr:FlxTimer)
 		{
-			dad.dance();
+			rival.dance();
 			gf.dance();
 			boyfriend.playAnim('idle');
 
@@ -791,9 +791,9 @@ class PlayState extends MusicBeatState
 	function moveCamera(isDad:Bool = false) {
 		if(isDad)
 		{
-			camFollow.set(dad.getMidpoint().x + 150, dad.getMidpoint().y - 100);
-			camFollow.x += dad.cameraPosition[0];// + opponentCameraOffset[0];
-			camFollow.y += dad.cameraPosition[1]; //+ opponentCameraOffset[1];
+			camFollow.set(rival.getMidpoint().x + 150, rival.getMidpoint().y - 100);
+			camFollow.x += rival.cameraPosition[0];// + opponentCameraOffset[0];
+			camFollow.y += rival.cameraPosition[1]; //+ opponentCameraOffset[1];
 			tweenCamIn();
 		}
 		else
@@ -1237,16 +1237,16 @@ class PlayState extends MusicBeatState
 					switch (Math.abs(daNote.noteData))
 					{
 						case 0:
-							dad.playAnim('singLEFT' + altAnim, true);
+							rival.playAnim('singLEFT' + altAnim, true);
 						case 1:
-							dad.playAnim('singDOWN' + altAnim, true);
+							rival.playAnim('singDOWN' + altAnim, true);
 						case 2:
-							dad.playAnim('singUP' + altAnim, true);
+							rival.playAnim('singUP' + altAnim, true);
 						case 3:
-							dad.playAnim('singRIGHT' + altAnim, true);
+							rival.playAnim('singRIGHT' + altAnim, true);
 					}
 
-					dad.holdTimer = 0;
+					rival.holdTimer = 0;
 
 					if (SONG.needsVoices)
 						vocals.volume = 1;
@@ -1822,7 +1822,7 @@ class PlayState extends MusicBeatState
 			resyncVocals();
 		}
 
-		if (dad.curCharacter == 'spooky' && curStep % 4 == 2)
+		if (rival.curCharacter == 'spooky' && curStep % 4 == 2)
 		{
 			// dad.dance();
 		}
@@ -1849,7 +1849,7 @@ class PlayState extends MusicBeatState
 
 			// Dad doesnt interupt his own notes
 			if (SONG.notes[Math.floor(curStep / 16)].mustHitSection)
-				dad.dance();
+				rival.dance();
 		}
 		// FlxG.log.add('change bpm' + SONG.notes[Std.int(curStep / 16)].changeBPM);
 
@@ -1887,10 +1887,10 @@ class PlayState extends MusicBeatState
 			boyfriend.playAnim('hey', true);
 		}
 
-		if (curBeat % 16 == 15 && SONG.song == 'Tutorial' && dad.curCharacter == 'gf' && curBeat > 16 && curBeat < 48)
+		if (curBeat % 16 == 15 && SONG.song == 'Tutorial' && rival.curCharacter == 'gf' && curBeat > 16 && curBeat < 48)
 		{
 			boyfriend.playAnim('hey', true);
-			dad.playAnim('cheer', true);
+			rival.playAnim('cheer', true);
 		}
 	}
 }

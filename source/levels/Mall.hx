@@ -18,7 +18,7 @@ class Mall extends PlayState
             PlayState.curStage = 'mallEvil';
 
             BF_POS.set(1090, 100);
-            DAD_POS.set(100, 20);
+            RIVAL_POS.set(100, 20);
 
             var bg:BGSprite = new BGSprite('christmas/evilBG', -400, -500, 0.2, 0.2);
             bg.antialiasing = true;

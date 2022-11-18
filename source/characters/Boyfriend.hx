@@ -1,9 +1,4 @@
-package;
-
-import flixel.FlxG;
-import flixel.FlxSprite;
-import flixel.graphics.frames.FlxAtlasFrames;
-import flixel.util.FlxTimer;
+package characters;
 
 using StringTools;
 
@@ -11,7 +6,10 @@ class Boyfriend extends Character
 {
 	public var stunned:Bool = false;
 
-	public function new(x:Float, y:Float, ?char:String = 'bf')
+	// This doesn't currently serve any purpose, but I believe it will at some point. Probably when I get to improving the strums
+	public var girlfriend:Girlfriend = null;
+
+	public function new(x:Float, y:Float, char:String = 'bf', ?girlfriend:Girlfriend)
 	{
 		super(x, y, char, true);
 	}
