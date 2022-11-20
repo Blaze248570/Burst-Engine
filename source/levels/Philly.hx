@@ -38,8 +38,6 @@ class Philly extends PlayState {
 
         var street:BGSprite = new BGSprite('philly/street', -40, streetBehind.y);
         add(street);
-
-        createCharacters();
     }
 
     override public function update(elapsed:Float) {

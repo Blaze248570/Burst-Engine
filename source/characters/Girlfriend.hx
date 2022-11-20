@@ -4,10 +4,8 @@ class Girlfriend extends Character
 {
     public var boyfriend:Boyfriend = null;
 
-    public function new(x:Float, y:Float, char:String = 'gf', boyfriend:Boyfriend) {
+    public function new(x:Float, y:Float, char:String = 'gf') {
         super(x, y, char, false);
-
-        this.boyfriend = boyfriend;
 
         switch(curCharacter) {
 

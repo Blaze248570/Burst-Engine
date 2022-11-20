@@ -14,7 +14,6 @@ import flixel.FlxSprite;
 import flixel.FlxSubState;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.group.FlxGroup.FlxTypedGroup;
-import flixel.group.FlxSpriteGroup;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
@@ -29,6 +28,12 @@ import flixel.util.FlxTimer;
 
 using StringTools;
 
+/**
+	The main "game state" where all the action happens
+
+	You can make a stage within the `createStage()` function with a `switch` or 
+	you can extend this class and override the same function if you're into organization
+ */
 class PlayState extends MusicBeatState
 {
 	public static var curStage:String = '';
@@ -40,10 +45,10 @@ class PlayState extends MusicBeatState
 
 	private var vocals:FlxSound;
 	
-	private var gf:Girlfriend;
-	private var boyfriend:Boyfriend;
-	private var rival:Rival;
-	private var girlrival:Girlrival;
+	private var gf:Girlfriend = null;
+	private var boyfriend:Boyfriend = null;
+	private var rival:Rival = null;
+	private var girlrival:Girlrival = null;
 
 	private var notes:FlxTypedGroup<Note>;
 	private var unspawnNotes:Array<Note> = [];
@@ -90,9 +95,8 @@ class PlayState extends MusicBeatState
 
 	var defaultCamZoom:Float = 1.05;
 
-	// how big to stretch the pixel art assets
-	public static var isPixelLevel:Bool = false;
 	public static var daPixelZoom:Float = 6;
+	public static var isPixelLevel:Bool = false;
 
 	var inCutscene:Bool = false;
 
@@ -105,12 +109,19 @@ class PlayState extends MusicBeatState
 	var detailsPausedText:String = "";
 	#end
 
+	/**
+		Function used by the `PlayState` to draw the stage, characters, and cameras, as well as load the song
+
+		It is *highly* recommended that child classes do not override this function and instead override one of its helper functions such as:
+		* `createStage()`
+		* `createCharacters()`
+		* `setUpCameras()`
+	 */
 	override public function create()
 	{
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
 
-		// var gameCam:FlxCamera = FlxG.camera;
 		camGame = new FlxCamera();
 		camHUD = new FlxCamera();
 		camHUD.bgColor.alpha = 0;
@@ -118,7 +129,7 @@ class PlayState extends MusicBeatState
 		FlxG.cameras.reset(camGame);
 		FlxG.cameras.add(camHUD);
 
-		// NOTE: Maybe look into fixing this?
+		// NOTE: Maybe look into updating this?
 		FlxCamera.defaultCameras = [camGame];
 
 		persistentUpdate = true;
@@ -131,7 +142,7 @@ class PlayState extends MusicBeatState
 		Conductor.mapBPMChanges(SONG);
 		Conductor.changeBPM(SONG.bpm);
 
-		switch (SONG.song.toLowerCase())
+		switch (Paths.formatToSongPath(SONG.song))
 		{
 			case 'tutorial':
 				dialogue = ["Hey you're pretty cute.", 'Use the arrow keys to keep up \nwith me singing.'];
@@ -159,10 +170,15 @@ class PlayState extends MusicBeatState
 		}
 
 		#if desktop
-		updateDiscord();
+		setUpDiscord();
 		#end
 
 		createStage();
+
+		if((boyfriend == null || gf == null || rival == null))
+			createCharacters();
+
+		setUpCameras();
 
 		Conductor.songPosition = -5000;
 
@@ -198,7 +214,12 @@ class PlayState extends MusicBeatState
 		super.create();
 	}
 
-	function updateDiscord() {
+	/**
+		Helper function used by `create()` to update Discord Rich Presence
+
+		~ Only used if compiled to desktop
+	 */
+	function setUpDiscord() {
 		// Making difficulty text for Discord Rich Presence.
 		switch (storyDifficulty)
 		{
@@ -241,15 +262,12 @@ class PlayState extends MusicBeatState
 	}
 
 	/**
-		Function meant for subclasses to override when creating stage viuals.
-	
-		WARNING: 
-	
-		Do NOT forget to call `createCharacters()` when overriding this function or it'll crash because the characters never get made 
+		Helper function used by `create()` to draw the background and surroundings. 
+			
+		Subclasses should override this when creating stage viuals. 
+		However, `super.createStage()` SHOULD NOT be called when overriding or else it'll draw the theatre underneath!
 
-		and
-
-		Do NOT call `super.createStage()` when overriding or else it'll draw the theatre underneath!
+		If sprites need to be layered above the characters, call `createCharacters()` within the overriden function
 	 */
 	function createStage():Void {
 		defaultCamZoom = 0.9;
@@ -271,10 +289,76 @@ class PlayState extends MusicBeatState
         stageCurtains.antialiasing = true;
 
         add(stageCurtains);
-
-        createCharacters();
 	 }
 
+	var BF_POS:FlxPoint = new FlxPoint(770, 100);
+	var GF_POS:FlxPoint = new FlxPoint(400, 130);
+	var RIVAL_POS:FlxPoint = new FlxPoint(100, 100);
+	var GRIVAL_POS:FlxPoint = new FlxPoint(0, 0);
+
+	/**
+		Helper function used by `create()` to instantiate and draw the characters.
+			
+		Subclasses may override this, but it is suggested that it is left alone.
+		If you'd simply like to alter a character's data, first call `super.createCharacters()` and change whatever variable like such:
+		
+		`boyfriend.x = 420`
+
+		@param bfVersion        Optional parameter to override the `SONG.player1` variable
+		@param gfVersion        Optional parameter to set gf to be something other than gf
+		@param rivalVersion     Optional parameter to override the `SONG.player2` variable
+		@param girlrivalVersion Optional parameter to have a second gf which corrosponds to the rival instead of the boyfriend
+	 */ 
+	function createCharacters(bfVersion:String = null, gfVersion:String = null, rivalVersion:String = null, girlrivalVersion:String = null) {
+		if(bfVersion == null)
+			bfVersion = SONG.player1;
+
+		if(gfVersion == null)
+			switch (curStage)
+			{
+				case 'limo':
+					gfVersion = 'gf-car';
+				case 'mall' | 'mallEvil':
+					gfVersion = 'gf-christmas';
+				case 'school' | 'schoolEvil':
+					gfVersion = 'gf-pixel';
+				default:
+					gfVersion = 'gf';
+			}
+
+		if(rivalVersion == null)
+			rivalVersion = SONG.player2;
+
+		rival = new Rival(0, 0, rivalVersion);
+		rival.setPosition(rival.positionArray[0] + RIVAL_POS.x, rival.positionArray[1] + RIVAL_POS.y);
+
+		if(girlrivalVersion != null) {
+			girlrival = new Girlrival(0, 0, girlrivalVersion);
+			girlrival.setPosition(girlrival.positionArray[0], girlrival.positionArray[1]);
+			rival.girlrival = girlrival;
+			girlrival.rival = rival;
+		}
+
+		boyfriend = new Boyfriend(0, 0, bfVersion);
+		boyfriend.setPosition(boyfriend.positionArray[0] + BF_POS.x, boyfriend.positionArray[1] + BF_POS.y);
+
+		gf = new Girlfriend(0, 0, gfVersion);
+		gf.setPosition(gf.positionArray[0] + GF_POS.x, gf.positionArray[1] + GF_POS.y);
+		gf.scrollFactor.set(0.95, 0.95);
+		boyfriend.girlfriend = gf;
+
+		add(gf);
+		if(girlrival != null)
+			add(girlrival);
+		add(rival);
+		add(boyfriend);
+	}
+
+	/**
+		Helper function used by `create()` to position the camera cameras.
+
+		It is recommended that this function not be overriden by subclasses, but you do as you feel capable.
+	 */
 	function setUpCameras() {
 		var camPos:FlxPoint = new FlxPoint(FlxG.width / 2, FlxG.height / 2);
 		if(gf == null) {
@@ -322,63 +406,13 @@ class PlayState extends MusicBeatState
 		// moveCameraSection();
 	} 
 
-	var BF_POS:FlxPoint = new FlxPoint(770, 100);
-	var GF_POS:FlxPoint = new FlxPoint(400, 130);
-	var RIVAL_POS:FlxPoint = new FlxPoint(100, 100);
-	var GRIVAL_POS:FlxPoint = new FlxPoint(0, 0);
-
 	/**
-		Function meant for subclasses to override when creating characters.
+		Helper function used by `create()` to instantiate, draw, assign hud objects to the `camHUD` camera.
 
-		It is *highly* suggested that `super.createCharacters()` is called.
-		If you do not call super, make sure that `setUpCameras()` is called.
-		@param bfVersion        Set this to override the `SONG.player1` variable
-		@param gfVersion        Set this if you'd like gf to be something other than gf
-		@param rivalVersion     Set this to override the `SONG.player2` variable
-		@param girlrivalVersion Set this to have a second gf which corrospnds to the rival instead of the boyfriend
-	 */ 
-	function createCharacters(bfVersion:String = null, gfVersion:String = null, rivalVersion:String = null, girlrivalVersion:String = null) {
-		if(bfVersion == null)
-			bfVersion = SONG.player1;
+		Subclasses should override this in order to add sprites to the `camHUD`. Just rememeber to assign each sprite to said camera like such:
 
-		if(gfVersion == null)
-			switch (curStage)
-			{
-				case 'limo':
-					gfVersion = 'gf-car';
-				case 'mall' | 'mallEvil':
-					gfVersion = 'gf-christmas';
-				case 'school' | 'schoolEvil':
-					gfVersion = 'gf-pixel';
-				default:
-					gfVersion = 'gf';
-			}
-
-		if(rivalVersion == null)
-			rivalVersion = SONG.player2;
-
-		rival = new Rival(rival.positionArray[0] + RIVAL_POS.x, rival.positionArray[1] + RIVAL_POS.y, rivalVersion, girlrival);
-
-		if(girlrivalVersion != null) {
-			girlrival = new Girlrival(0, 0, girlrivalVersion, rival);
-			girlrival.setPosition(girlrival.positionArray[0], girlrival.positionArray[1]);
-			rival.girlrival = girlrival;
-		}
-
-		boyfriend = new Boyfriend(boyfriend.positionArray[0] + BF_POS.x, boyfriend.positionArray[1] + BF_POS.y, bfVersion, gf);
-
-		gf = new Girlfriend(gf.positionArray[0] + GF_POS.x, gf.positionArray[1] + GF_POS.y, gfVersion, boyfriend);
-		gf.scrollFactor.set(0.95, 0.95);
-
-		add(gf);
-		if(girlrival != null)
-			add(girlrival);
-		add(rival);
-		add(boyfriend);
-
-		setUpCameras();
-	}
-
+		`healthBar.cameras = [camHUD]`
+	 */
 	function generateHUD() {
 		healthBarBG = new FlxSprite(0, FlxG.height * 0.9).loadGraphic(Paths.image('healthBar'));
 		healthBarBG.screenCenter(X);
@@ -417,7 +451,7 @@ class PlayState extends MusicBeatState
 	/**
 		Function meant for subclasses to override when loading starting cutscenes.
 
-		WARNING: Calling `super.startCutscene()` will cause the cutscene to be skipped.
+		WARNING: DO NOT call `super.startCutscene()` as it will cause the cutscene to be ignored.
 	*/
 	function startCutscene() {
 		startCountdown();

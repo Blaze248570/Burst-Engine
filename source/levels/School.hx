@@ -141,8 +141,6 @@ class School extends PlayState
             bgGirls.antialiasing = false;
             add(bgGirls);
         }
-
-        createCharacters();
     }
 
     override public function createCharacters(bfVersion:String = null, gfVersion:String = null, dadVersion:String = null, girlrivalVersion:String = null) {

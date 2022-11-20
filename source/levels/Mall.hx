@@ -76,8 +76,6 @@ class Mall extends PlayState
             santa.antialiasing = true;
             add(santa);
         }
-
-        createCharacters();
     }
 
     override function startCutscene() {

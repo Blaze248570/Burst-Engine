@@ -12,8 +12,6 @@ class Spooky extends PlayState
         halloweenBG = new BGSprite('halloween_bg', -200, -100, 1.0, 1.0, ['halloweem bg0', 'halloweem bg lightning strike']);
         halloweenBG.antialiasing = true;
         add(halloweenBG);
-
-        createCharacters();
     }
 
     var lightningStrikeBeat:Int = 0;
