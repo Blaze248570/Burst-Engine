@@ -3,15 +3,16 @@ package;
 #if desktop
 import Discord.DiscordClient;
 #end
-import flash.text.TextField;
+
+import levels.MasterLevel;
+
 import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.addons.display.FlxGridOverlay;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
-import lime.utils.Assets;
+// import lime.utils.Assets;
 
 using StringTools;
 
@@ -21,6 +22,7 @@ class FreeplayState extends MusicBeatState
 
 	var selector:FlxText;
 	var curSelected:Int = 0;
+	static var lastSelected:Int = 0;
 	var curDifficulty:Int = 1;
 
 	var scoreText:FlxText;
@@ -48,7 +50,7 @@ class FreeplayState extends MusicBeatState
 				if (!FlxG.sound.music.playing)
 					FlxG.sound.playMusic(Paths.music('freakyMenu'));
 			}
-		 */
+		*/
 
 		#if desktop
 		// Updating Discord Rich Presence
@@ -123,7 +125,7 @@ class FreeplayState extends MusicBeatState
 
 		add(scoreText);
 
-		changeSelection();
+		changeSelection(lastSelected);
 		changeDiff();
 
 		// FlxG.sound.playMusic(Paths.music('title'), 0);
@@ -134,7 +136,7 @@ class FreeplayState extends MusicBeatState
 		selector.text = ">";
 		// add(selector);
 
-		var swag:Alphabet = new Alphabet(1, 0, "swag");
+		// var swag:Alphabet = new Alphabet(1, 0, "swag");
 
 		// JUST DOIN THIS SHIT FOR TESTING!!!
 		/* 
@@ -159,6 +161,9 @@ class FreeplayState extends MusicBeatState
 	public function addSong(songName:String, weekNum:Int, songCharacter:String)
 	{
 		songs.push(new SongMetadata(songName, weekNum, songCharacter));
+
+		// That should stop the Freeplya menu from being so slow
+		Paths.returnSound('${Paths.formatToSongPath(songName)}/Inst', 'songs');
 	}
 
 	public function addWeek(songs:Array<String>, weekNum:Int, ?songCharacters:Array<String>)
@@ -221,12 +226,12 @@ class FreeplayState extends MusicBeatState
 
 			trace(poop);
 
-			PlayState.SONG = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
-			PlayState.isStoryMode = false;
-			PlayState.storyDifficulty = curDifficulty;
+			MasterLevel.SONG = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
+			MasterLevel.isStoryMode = false;
+			MasterLevel.storyDifficulty = curDifficulty;
 
-			PlayState.storyWeek = songs[curSelected].week;
-			trace('CUR WEEK' + PlayState.storyWeek);
+			MasterLevel.storyWeek = songs[curSelected].week;
+			trace('CUR WEEK' + MasterLevel.storyWeek);
 			// NOTE: Adjust for flexibility (Weeks that aren't literally called "week")
 			LoadingState.loadAndSwitchState(levels.LevelData.getLevel("week" + songs[curSelected].week));
 		}
@@ -261,6 +266,7 @@ class FreeplayState extends MusicBeatState
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 
 		curSelected += change;
+		lastSelected = curSelected;
 
 		if (curSelected < 0)
 			curSelected = songs.length - 1;

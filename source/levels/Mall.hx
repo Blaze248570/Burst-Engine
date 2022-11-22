@@ -7,15 +7,15 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 
-class Mall extends PlayState 
+class Mall extends MasterLevel 
 {
     var upperBoppers:BGSprite = null;
 	var bottomBoppers:BGSprite = null;
 	var santa:BGSprite = null;
 
     override public function createStage() {
-        if(Paths.formatToSongPath(PlayState.SONG.song) == 'winter-horrorland') {
-            PlayState.curStage = 'mallEvil';
+        if(Paths.formatToSongPath(MasterLevel.SONG.song) == 'winter-horrorland') {
+            MasterLevel.curStage = 'mallEvil';
 
             BF_POS.set(1090, 100);
             RIVAL_POS.set(100, 20);
@@ -34,7 +34,7 @@ class Mall extends PlayState
             evilSnow.antialiasing = true;
             add(evilSnow);
         } else {
-            PlayState.curStage = 'mall';
+            MasterLevel.curStage = 'mall';
 
             defaultCamZoom = 0.80;
             BF_POS.set(970, 100);

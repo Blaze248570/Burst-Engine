@@ -2,12 +2,12 @@ package levels;
 
 import flixel.FlxG;
 
-class Spooky extends PlayState
+class Spooky extends MasterLevel
 {
     var halloweenBG:BGSprite;
 
     override public function createStage() {
-        PlayState.curStage = 'spooky';
+        MasterLevel.curStage = 'spooky';
 
         halloweenBG = new BGSprite('halloween_bg', -200, -100, 1.0, 1.0, ['halloweem bg0', 'halloweem bg lightning strike']);
         halloweenBG.antialiasing = true;

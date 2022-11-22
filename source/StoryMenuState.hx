@@ -6,15 +6,13 @@ import Discord.DiscordClient;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.addons.transition.FlxTransitionableState;
-import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.group.FlxGroup;
-import flixel.math.FlxMath;
 import flixel.text.FlxText;
-import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
-import lime.net.curl.CURLCode;
+
+import levels.MasterLevel;
 
 using StringTools;
 
@@ -225,7 +223,7 @@ class StoryMenuState extends MusicBeatState
 	override function update(elapsed:Float)
 	{
 		// scoreText.setFormat('VCR OSD Mono', 32);
-		lerpScore = Math.floor(FlxMath.lerp(lerpScore, intendedScore, 0.5));
+		lerpScore = Math.floor(flixel.math.FlxMath.lerp(lerpScore, intendedScore, 0.5));
 
 		scoreText.text = "WEEK SCORE:" + lerpScore;
 
@@ -304,8 +302,8 @@ class StoryMenuState extends MusicBeatState
 				stopspamming = true;
 			}
 
-			PlayState.storyPlaylist = weekData[curWeek];
-			PlayState.isStoryMode = true;
+			MasterLevel.storyPlaylist = weekData[curWeek];
+			MasterLevel.isStoryMode = true;
 			selectedWeek = true;
 
 			var diffic = "";
@@ -318,11 +316,11 @@ class StoryMenuState extends MusicBeatState
 					diffic = '-hard';
 			}
 
-			PlayState.storyDifficulty = curDifficulty;
+			MasterLevel.storyDifficulty = curDifficulty;
 
-			PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + diffic, PlayState.storyPlaylist[0].toLowerCase());
-			PlayState.storyWeek = curWeek;
-			PlayState.campaignScore = 0;
+			MasterLevel.SONG = Song.loadFromJson(MasterLevel.storyPlaylist[0].toLowerCase() + diffic, MasterLevel.storyPlaylist[0].toLowerCase());
+			MasterLevel.storyWeek = curWeek;
+			MasterLevel.campaignScore = 0;
 			new FlxTimer().start(1, function(tmr:FlxTimer)
 			{
 				LoadingState.loadAndSwitchState(levels.LevelData.getLevel("week" + curWeek), true);
@@ -364,7 +362,7 @@ class StoryMenuState extends MusicBeatState
 		intendedScore = Highscore.getWeekScore(curWeek, curDifficulty);
 		#end
 
-		FlxTween.tween(sprDifficulty, {y: leftArrow.y + 15, alpha: 1}, 0.07);
+		flixel.tweens.FlxTween.tween(sprDifficulty, {y: leftArrow.y + 15, alpha: 1}, 0.07);
 	}
 
 	var lerpScore:Int = 0;

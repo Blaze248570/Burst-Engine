@@ -1,5 +1,7 @@
 package characters;
 
+import levels.MasterLevel;
+
 using StringTools;
 
 typedef AnimationData = {
@@ -120,7 +122,7 @@ class Character extends flixel.FlxSprite
 				flipX = !isPlayer;
 				antialiasing = false;
 
-				setGraphicSize(Std.int(width * PlayState.daPixelZoom));
+				setGraphicSize(Std.int(width * MasterLevel.daPixelZoom));
 				updateHitbox();
 
 				animationData = [
@@ -157,7 +159,7 @@ class Character extends flixel.FlxSprite
 				flipX = !isPlayer;
 				antialiasing = false;
 
-				setGraphicSize(Std.int(width * PlayState.daPixelZoom));
+				setGraphicSize(Std.int(width * MasterLevel.daPixelZoom));
 				updateHitbox();
 				
 				animationData = [
@@ -197,7 +199,7 @@ class Character extends flixel.FlxSprite
 				frames = Paths.getSparrowAtlas('weeb/gfPixel');
 				antialiasing = false;
 
-				setGraphicSize(Std.int(width * PlayState.daPixelZoom));
+				setGraphicSize(Std.int(width * MasterLevel.daPixelZoom));
 				updateHitbox();
 
 				animationData = [
@@ -294,7 +296,7 @@ class Character extends flixel.FlxSprite
 				frames = Paths.getSparrowAtlas('weeb/senpai');
 				antialiasing = false;
 	
-				setGraphicSize(Std.int(width * PlayState.daPixelZoom));
+				setGraphicSize(Std.int(width * MasterLevel.daPixelZoom));
 				updateHitbox();
 
 				animationData = (curCharacter == 'senpai-angry') 
@@ -322,7 +324,7 @@ class Character extends flixel.FlxSprite
 				frames = Paths.getPackerAtlas('weeb/spirit');
 				antialiasing = false;
 
-				setGraphicSize(Std.int(width * PlayState.daPixelZoom));
+				setGraphicSize(Std.int(width * MasterLevel.daPixelZoom));
 				updateHitbox();
 
 				animationData = [

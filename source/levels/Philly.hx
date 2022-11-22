@@ -3,14 +3,14 @@ package levels;
 import flixel.FlxG;
 import flixel.system.FlxSound;
 
-class Philly extends PlayState {
+class Philly extends MasterLevel {
     var phillyLightsColors:Array<flixel.util.FlxColor>;
     var phillyCityLights:BGSprite;
 	var phillyTrain:BGSprite;
 	var trainSound:FlxSound;
 
     override public function createStage() {
-        PlayState.curStage = 'philly';
+        MasterLevel.curStage = 'philly';
 
         var bg:BGSprite = new BGSprite('philly/sky', -100, 0, 0.1, 0.1);
         add(bg);

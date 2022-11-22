@@ -1,4 +1,4 @@
-package;
+package levels;
 
 import characters.*;
 #if desktop
@@ -28,13 +28,17 @@ import flixel.util.FlxTimer;
 
 using StringTools;
 
+// I'd just like to say, needlessly importing classes is sloppy and it DOES affect performance. 
+// For Java it does at least.
+// Don't import things that aren't needed.
+
 /**
 	The main "game state" where all the action happens
 
 	You can make a stage within the `createStage()` function with a `switch` or 
 	you can extend this class and override the same function if you're into organization
  */
-class PlayState extends MusicBeatState
+class MasterLevel extends MusicBeatState
 {
 	public static var curStage:String = '';
 	public static var SONG:SwagSong;
@@ -110,7 +114,7 @@ class PlayState extends MusicBeatState
 	#end
 
 	/**
-		Function used by the `PlayState` to draw the stage, characters, and cameras, as well as load the song
+		Function used by the `MasterLevel` to draw the stage, characters, and cameras, as well as load the song
 
 		It is *highly* recommended that child classes do not override this function and instead override one of its helper functions such as:
 		* `createStage()`
@@ -271,7 +275,7 @@ class PlayState extends MusicBeatState
 	 */
 	function createStage():Void {
 		defaultCamZoom = 0.9;
-        PlayState.curStage = 'stage';
+        curStage = 'stage';
 
         var bg:BGSprite = new BGSprite('stageback', -600, -200, 0.9, 0.9);
         bg.antialiasing = true;
@@ -451,7 +455,7 @@ class PlayState extends MusicBeatState
 	/**
 		Function meant for subclasses to override when loading starting cutscenes.
 
-		WARNING: DO NOT call `super.startCutscene()` as it will cause the cutscene to be ignored.
+		WARNING: DO NOT call `super.startCutscene()` as it will cause the countdown to begin early!
 	*/
 	function startCutscene() {
 		startCountdown();
@@ -474,6 +478,8 @@ class PlayState extends MusicBeatState
 
 		var swagCounter:Int = 0;
 
+		// Loops the counter 5 times, and adding one to swagCounter each time
+		// swagCounter is then used to determine which sound an image to create
 		startTimer = new FlxTimer().start(Conductor.crochet / 1000, function(tmr:FlxTimer)
 		{
 			rival.dance();
@@ -557,7 +563,6 @@ class PlayState extends MusicBeatState
 			}
 
 			swagCounter += 1;
-			// generateSong('fresh');
 		}, 5);
 	}
 
@@ -573,7 +578,7 @@ class PlayState extends MusicBeatState
 		lastReportedPlayheadPosition = 0;
 
 		if (!paused)
-			FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
+			FlxG.sound.playMusic(Paths.inst(SONG.song), 1, false);
 		FlxG.sound.music.onComplete = endSong;
 		vocals.play();
 
@@ -597,7 +602,7 @@ class PlayState extends MusicBeatState
 		curSong = Paths.formatToSongPath(SONG.song);
 
 		if (SONG.needsVoices)
-			vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song));
+			vocals = new FlxSound().loadEmbedded(Paths.voices(SONG.song));
 		else
 			vocals = new FlxSound();
 
@@ -983,14 +988,7 @@ class PlayState extends MusicBeatState
 			persistentDraw = true;
 			paused = true;
 
-			// 1 / 1000 chance for Gitaroo Man easter egg
-			if (FlxG.random.bool(0.1))
-			{
-				// gitaroo man easter egg
-				FlxG.switchState(new GitarooPause());
-			}
-			else
-				openSubState(new PauseSubState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
+			openSubState(new PauseSubState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
 		
 			#if desktop
 			DiscordClient.changePresence(detailsPausedText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
@@ -1074,16 +1072,16 @@ class PlayState extends MusicBeatState
 			// Conductor.lastSongPos = FlxG.sound.music.time;
 		}
 
-		if (generatedMusic && PlayState.SONG.notes[Std.int(curStep / 16)] != null)
+		if (generatedMusic && SONG.notes[Std.int(curStep / 16)] != null)
 		{
 			/*
 				if (curBeat % 4 == 0)
 				{
-					trace(PlayState.SONG.notes[Std.int(curStep / 16)].mustHitSection);
+					trace(MasterLevel.SONG.notes[Std.int(curStep / 16)].mustHitSection);
 				}
 			*/
 
-			if (PlayState.SONG.notes[Std.int(curStep / 16)].mustHitSection)
+			if (SONG.notes[Std.int(curStep / 16)].mustHitSection)
 			{
 				moveCamera();
 				/*
@@ -1174,7 +1172,7 @@ class PlayState extends MusicBeatState
 				case 128, 129, 130:
 					vocals.volume = 0;
 					// FlxG.sound.music.stop();
-					// FlxG.switchState(new PlayState());
+					// FlxG.switchState(new MasterLevel());
 			}
 		}
 		// better streaming of shit
@@ -1205,8 +1203,6 @@ class PlayState extends MusicBeatState
 			FlxG.sound.music.stop();
 
 			openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
-
-			// FlxG.switchState(new GameOverState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
 			
 			#if desktop
 			// Game Over doesn't get his own variable because it's only used here
@@ -1291,7 +1287,7 @@ class PlayState extends MusicBeatState
 				}
 
 				// WIP interpolation shit? Need to fix the pause issue
-				// daNote.y = (strumLine.y - (songTime - daNote.strumTime) * (0.45 * PlayState.SONG.speed));
+				// daNote.y = (strumLine.y - (songTime - daNote.strumTime) * (0.45 * MasterLevel.SONG.speed));
 
 				if (daNote.y < -daNote.height)
 				{
@@ -1368,7 +1364,7 @@ class PlayState extends MusicBeatState
 					difficulty = '-hard';
 
 				trace('LOADING NEXT SONG');
-				trace(PlayState.storyPlaylist[0].toLowerCase() + difficulty);
+				trace(storyPlaylist[0].toLowerCase() + difficulty);
 
 				endingCutscene();
 
@@ -1378,7 +1374,7 @@ class PlayState extends MusicBeatState
 				prevCamFollow = camFollow;
 				prevCamFollowPos = camFollowPos;
 
-				PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + difficulty, PlayState.storyPlaylist[0]);
+				SONG = Song.loadFromJson(storyPlaylist[0].toLowerCase() + difficulty, storyPlaylist[0]);
 				FlxG.sound.music.stop();
 
 				LoadingState.loadAndSwitchState(levels.LevelData.getLevel("week" + storyWeek));

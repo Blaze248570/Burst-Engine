@@ -3,16 +3,15 @@ package;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.addons.text.FlxTypeText;
-import flixel.graphics.frames.FlxAtlasFrames;
-import flixel.group.FlxSpriteGroup;
-import flixel.input.FlxKeyManager;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 
+import levels.MasterLevel;
+
 using StringTools;
 
-class DialogueBox extends FlxSpriteGroup
+class DialogueBox extends flixel.group.FlxSpriteGroup
 {
 	var box:FlxSprite;
 
@@ -38,7 +37,7 @@ class DialogueBox extends FlxSpriteGroup
 	{
 		super();
 
-		switch (PlayState.SONG.song.toLowerCase())
+		switch (MasterLevel.SONG.song.toLowerCase())
 		{
 			case 'senpai':
 				FlxG.sound.playMusic(Paths.music('Lunchbox'), 0);
@@ -63,7 +62,7 @@ class DialogueBox extends FlxSpriteGroup
 		box = new FlxSprite(-20, 45);
 		
 		var hasDialog = false;
-		switch (PlayState.SONG.song.toLowerCase())
+		switch (MasterLevel.SONG.song.toLowerCase())
 		{
 			case 'senpai':
 				hasDialog = true;
@@ -97,7 +96,7 @@ class DialogueBox extends FlxSpriteGroup
 		portraitLeft = new FlxSprite(-20, 40);
 		portraitLeft.frames = Paths.getSparrowAtlas('weeb/senpaiPortrait');
 		portraitLeft.animation.addByPrefix('enter', 'Senpai Portrait Enter', 24, false);
-		portraitLeft.setGraphicSize(Std.int(portraitLeft.width * PlayState.daPixelZoom * 0.9));
+		portraitLeft.setGraphicSize(Std.int(portraitLeft.width * MasterLevel.daPixelZoom * 0.9));
 		portraitLeft.updateHitbox();
 		portraitLeft.scrollFactor.set();
 		add(portraitLeft);
@@ -106,14 +105,14 @@ class DialogueBox extends FlxSpriteGroup
 		portraitRight = new FlxSprite(0, 40);
 		portraitRight.frames = Paths.getSparrowAtlas('weeb/bfPortrait');
 		portraitRight.animation.addByPrefix('enter', 'Boyfriend portrait enter', 24, false);
-		portraitRight.setGraphicSize(Std.int(portraitRight.width * PlayState.daPixelZoom * 0.9));
+		portraitRight.setGraphicSize(Std.int(portraitRight.width * MasterLevel.daPixelZoom * 0.9));
 		portraitRight.updateHitbox();
 		portraitRight.scrollFactor.set();
 		add(portraitRight);
 		portraitRight.visible = false;
 		
 		box.animation.play('normalOpen');
-		box.setGraphicSize(Std.int(box.width * PlayState.daPixelZoom * 0.9));
+		box.setGraphicSize(Std.int(box.width * MasterLevel.daPixelZoom * 0.9));
 		box.updateHitbox();
 		add(box);
 
@@ -151,9 +150,9 @@ class DialogueBox extends FlxSpriteGroup
 	override function update(elapsed:Float)
 	{
 		// HARD CODING CUZ IM STUPDI
-		if (PlayState.SONG.song.toLowerCase() == 'roses')
+		if (MasterLevel.SONG.song.toLowerCase() == 'roses')
 			portraitLeft.visible = false;
-		if (PlayState.SONG.song.toLowerCase() == 'thorns')
+		if (MasterLevel.SONG.song.toLowerCase() == 'thorns')
 		{
 			portraitLeft.color = FlxColor.BLACK;
 			swagDialogue.color = FlxColor.WHITE;
@@ -189,7 +188,7 @@ class DialogueBox extends FlxSpriteGroup
 				{
 					isEnding = true;
 
-					if (PlayState.SONG.song.toLowerCase() == 'senpai' || PlayState.SONG.song.toLowerCase() == 'thorns')
+					if (MasterLevel.SONG.song.toLowerCase() == 'senpai' || MasterLevel.SONG.song.toLowerCase() == 'thorns')
 						FlxG.sound.music.fadeOut(2.2, 0);
 
 					new FlxTimer().start(0.2, function(tmr:FlxTimer)

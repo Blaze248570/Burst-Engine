@@ -26,7 +26,7 @@ class LevelData
                 // curLevel = new BattleGround();
 
             default:
-                curLevel = new PlayState();
+                curLevel = new MasterLevel();
         }
 
         return curLevel;
