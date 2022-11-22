@@ -162,8 +162,8 @@ class FreeplayState extends MusicBeatState
 	{
 		songs.push(new SongMetadata(songName, weekNum, songCharacter));
 
-		// That should stop the Freeplya menu from being so slow
-		Paths.returnSound('${Paths.formatToSongPath(songName)}/Inst', 'songs');
+		// That should stop the Freeplay menu from being so slow
+		Paths.inst(Paths.formatToSongPath(songName));
 	}
 
 	public function addWeek(songs:Array<String>, weekNum:Int, ?songCharacters:Array<String>)
