@@ -1,1 +1,6 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Prevent audio files from warping due to LF normalization
+*.ogg binary
 *.mp3 binary
