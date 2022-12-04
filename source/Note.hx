@@ -7,10 +7,6 @@ import flixel.util.FlxColor;
 
 import levels.MasterLevel;
 
-#if polymod
-import polymod.format.ParseRules.TargetSignatureElement;
-#end
-
 using StringTools;
 
 class Note extends FlxSprite
@@ -37,7 +33,7 @@ class Note extends FlxSprite
 
 	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false)
 	{
-		super();
+		super(50, -2000); // MAKE SURE ITS DEFINITELY OFF SCREEN?
 
 		if (prevNote == null)
 			prevNote = this;
@@ -45,16 +41,10 @@ class Note extends FlxSprite
 		this.prevNote = prevNote;
 		isSustainNote = sustainNote;
 
-		x += 50;
-		// MAKE SURE ITS DEFINITELY OFF SCREEN?
-		y -= 2000;
 		this.strumTime = strumTime;
-
 		this.noteData = noteData;
 
-		var daStage:String = MasterLevel.curStage;
-
-		switch (daStage)
+		switch (MasterLevel.curStage)
 		{
 			case 'school' | 'schoolEvil':
 				loadGraphic(Paths.image('weeb/pixelUI/arrows-pixels'), true, 17, 17);
@@ -121,8 +111,6 @@ class Note extends FlxSprite
 				animation.play('redScroll');
 		}
 
-		// trace(prevNote);
-
 		if (isSustainNote && prevNote != null)
 		{
 			noteScore * 0.2;
@@ -165,11 +153,13 @@ class Note extends FlxSprite
 
 				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.5 * MasterLevel.SONG.speed;
 				prevNote.updateHitbox();
-				// prevNote.setGraphicSize();
 			}
 		}
 	}
 
+	/**
+		Tracks note progression and position, marking them as invalid if they're too late.	
+	**/
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);

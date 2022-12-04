@@ -5,7 +5,7 @@ import flixel.FlxSprite;
 import flixel.addons.effects.FlxTrail;
 // import flixel.addons.effects.FlxTrailArea;
 // import flixel.addons.effects.chainable.FlxEffectSprite;
-import flixel.addons.effects.chainable.FlxWaveEffect;
+// import flixel.addons.effects.chainable.FlxWaveEffect;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 
