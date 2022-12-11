@@ -8,8 +8,8 @@ class PlayerSettings
 {
 	static public var numPlayers(default, null):Int = 0;
 	static public var numAvatars(default, null):Int = 0;
-	static public var player1(default, null):PlayerSettings;
-	static public var player2(default, null):PlayerSettings;
+	static public var player1(default, null):Player;
+	static public var player2(default, null):Player;
 
 	#if (haxe >= "4.0.0")
 	static public final onAvatarAdd:FlxTypedSignal<PlayerSettings->Void> = new FlxTypedSignal();
@@ -69,7 +69,7 @@ class PlayerSettings
 			{
 				settings = player2;
 				if (player1.controls.keyboardScheme.match(Duo(_)))
-					player1.setKeyboardScheme(Solo);
+					player1.controls.setKeyboardScheme(scheme);
 			}
 			else
 				throw "Cannot remove avatar that is not for a player";
@@ -94,7 +94,8 @@ class PlayerSettings
 	{
 		if (player1 == null)
 		{
-			player1 = new PlayerSettings(0, Solo);
+			player1 = new Player();
+			player1.settings = new PlayerSettings(0, Solo);
 			++numPlayers;
 		}
 
@@ -105,14 +106,15 @@ class PlayerSettings
 			if (gamepad == null)
 				throw 'Unexpected null gamepad. id:0';
 
-			player1.controls.addDefaultGamepad(0);
+			player1.settings.controls.addDefaultGamepad(0);
 		}
 
 		if (numGamepads > 1)
 		{
 			if (player2 == null)
 			{
-				player2 = new PlayerSettings(1, None);
+				player2 = new Player();
+				player2.settings = new PlayerSettings(1, None);
 				++numPlayers;
 			}
 
@@ -120,7 +122,7 @@ class PlayerSettings
 			if (gamepad == null)
 				throw 'Unexpected null gamepad. id:0';
 
-			player2.controls.addDefaultGamepad(1);
+			player2.settings.controls.addDefaultGamepad(1);
 		}
 
 		// DeviceManager.init();
@@ -148,10 +150,5 @@ class PlayerSettings
 	{
 		this.id = id;
 		this.controls = new Controls('player$id', scheme);
-	}
-
-	public function setKeyboardScheme(scheme)
-	{
-		controls.setKeyboardScheme(scheme);
 	}
 }

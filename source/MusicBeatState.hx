@@ -7,10 +7,10 @@ class MusicBeatState extends flixel.addons.ui.FlxUIState
 
 	public var curStep:Int = 0;
 	public var curBeat:Int = 0;
-	private var controls(get, never):Controls;
+	public var controls(get, never):Controls;
 
 	inline function get_controls():Controls
-		return PlayerSettings.player1.controls;
+		return PlayerSettings.player1.settings.controls;
 
 	override function create()
 	{

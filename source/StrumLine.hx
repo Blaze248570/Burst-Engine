@@ -1,11 +1,10 @@
 package;
 
-import characters.Boyfriend;
+import characters.Character;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.group.FlxGroup.FlxTypedGroup;
-import flixel.group.FlxSpriteGroup;
 import flixel.math.FlxMath;
 import flixel.math.FlxRect;
 import flixel.tweens.FlxEase;
@@ -16,10 +15,13 @@ import levels.MasterLevel;
 
 using StringTools;
 
-class Strum
+class StrumLine
 {
+    public static var singAnimations:Array<String> = ['singLEFT', 'singDOWN', 'singUP', 'singRIGHT'];
+
     private var parent:MasterLevel;
     private var controls:Controls;
+    private var character:Character;
 
     public var strumLineNotes:FlxTypedGroup<StrumNote>;
     public var notes:FlxTypedGroup<Note>;
@@ -27,12 +29,16 @@ class Strum
 
     private var isPlayer:Bool;
 
-    public function new(parent:MasterLevel, controls:Controls) {
+    public function new(parent:MasterLevel, controls:Controls, character:Character) 
+    {
         this.parent = parent;
         if(controls != null)
             this.controls = controls;
         // else
             // this.controls = new ComputerPlayer();
+
+        this.character = character;
+        isPlayer = character.isPlayer;
 
         strumLineNotes = new FlxTypedGroup<StrumNote>();
         strumLineNotes.cameras = [parent.camHUD];
@@ -43,13 +49,12 @@ class Strum
         parent.add(notes);
     }
 
-    public function generateStaticArrows(player:Int):Void {
-        isPlayer = (player == 1);
-
+    public function generateStaticArrows():Void 
+    {
         for (i in 0...4)
         {
             // FlxG.log.add(i);
-            var babyArrow:StrumNote = new StrumNote(0, parent.strumLine.y, i, player);
+            var babyArrow:StrumNote = new StrumNote(0, parent.strumLine.y, i, (isPlayer ? 1 : 0));
 
             if (!MasterLevel.isStoryMode)
             {
@@ -65,11 +70,12 @@ class Strum
             babyArrow.animation.play('static');
             babyArrow.x += (Note.swagWidth * i);
             babyArrow.x += 50;
-            babyArrow.x += (FlxG.width / 2 * player);
+            babyArrow.x += (FlxG.width / 2 * (isPlayer ? 1 : 0));
         }
     }
 
-    public function update(elapsed:Float):Void {
+    public function update(elapsed:Float):Void 
+    {
         if (unspawnNotes[0] != null)
         {
             if (unspawnNotes[0].strumTime - Conductor.songPosition < 1500)
@@ -99,13 +105,14 @@ class Strum
 
                 daNote.y = (parent.strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(MasterLevel.SONG.speed, 2)));
 
-                if  (
-                        daNote.isSustainNote
-                    && 
-                        daNote.y + daNote.offset.y <= parent.strumLine.y + Note.swagWidth / 2
-                    && 
-                        (!daNote.mustPress || (daNote.wasGoodHit || (daNote.prevNote.wasGoodHit && !daNote.canBeHit)))
-                    )
+                if  
+                (
+                    daNote.isSustainNote
+                && 
+                    daNote.y + daNote.offset.y <= parent.strumLine.y + Note.swagWidth / 2
+                && 
+                    (!daNote.mustPress || (daNote.wasGoodHit || (daNote.prevNote.wasGoodHit && !daNote.canBeHit)))
+                )
                 {
                     var swagRect = new FlxRect(0, parent.strumLine.y + Note.swagWidth / 2 - daNote.y, daNote.width * 2, daNote.height * 2);
                     swagRect.y /= daNote.scale.y;
@@ -115,39 +122,8 @@ class Strum
                 }
 
                 if (!daNote.mustPress && daNote.wasGoodHit)
-                {
-                    if (MasterLevel.SONG.song != 'Tutorial')
-                        parent.camZooming = true;
-
-                    var altAnim:String = "";
-
-                    if (MasterLevel.SONG.notes[Math.floor(parent.curStep / 16)] != null)
-                    {
-                        if (MasterLevel.SONG.notes[Math.floor(parent.curStep / 16)].altAnim)
-                            altAnim = '-alt';
-                    }
-
-                    switch (Math.abs(daNote.noteData))
-                    {
-                        case 0:
-                            parent.rival.playAnim('singLEFT' + altAnim, true);
-                        case 1:
-                            parent.rival.playAnim('singDOWN' + altAnim, true);
-                        case 2:
-                            parent.rival.playAnim('singUP' + altAnim, true);
-                        case 3:
-                            parent.rival.playAnim('singRIGHT' + altAnim, true);
-                    }
-
-                    parent.rival.holdTimer = 0;
-
-                    if (MasterLevel.SONG.needsVoices)
-                        parent.vocals.volume = 1;
-
-                    daNote.kill();
-                    notes.remove(daNote, true);
-                    daNote.destroy();
-                }
+                    rivalNoteHit(daNote);
+                    
 
                 // WIP interpolation shit? Need to fix the pause issue
                 // daNote.y = (strumLine.y - (songTime - daNote.strumTime) * (0.45 * MasterLevel.SONG.speed));
@@ -258,9 +234,7 @@ class Strum
                     }
                 }
                 else // regular notes?
-                {
                     noteCheck(controlArray[daNote.noteData], daNote);
-                }
                 /* 
                     if (controlArray[daNote.noteData])
                         goodNoteHit(daNote);
@@ -293,9 +267,7 @@ class Strum
                     */
             }
             else
-            {
                 badNoteCheck();
-            }
         }
 
         if ((up || right || down || left) && !parent.boyfriend.stunned && parent.generatedMusic)
@@ -327,9 +299,7 @@ class Strum
         if (parent.boyfriend.holdTimer > Conductor.stepCrochet * 4 * 0.001 && !up && !down && !right && !left)
         {
             if (parent.boyfriend.animation.curAnim.name.startsWith('sing') && !parent.boyfriend.animation.curAnim.name.endsWith('miss'))
-            {
                 parent.boyfriend.playAnim('idle');
-            }
         }
 
         strumLineNotes.forEach(function(spr:FlxSprite)
@@ -394,17 +364,7 @@ class Strum
                 parent.boyfriend.stunned = false;
             });
 
-            switch (direction)
-            {
-                case 0:
-                    parent.boyfriend.playAnim('singLEFTmiss', true);
-                case 1:
-                    parent.boyfriend.playAnim('singDOWNmiss', true);
-                case 2:
-                    parent.boyfriend.playAnim('singUPmiss', true);
-                case 3:
-                    parent.boyfriend.playAnim('singRIGHTmiss', true);
-            }
+            parent.boyfriend.playAnim(singAnimations[direction] + 'miss', true);
         }
     }
 
@@ -432,12 +392,37 @@ class Strum
         if (keyP)
             goodNoteHit(note);
         else
-        {
             badNoteCheck();
-        }
     }
 
-    function goodNoteHit(note:Note):Void
+    function rivalNoteHit(daNote:Note):Void 
+    {
+        if (MasterLevel.SONG.song != 'Tutorial')
+            parent.camZooming = true;
+
+        var altAnim:String = "";
+
+        if (MasterLevel.SONG.notes[Math.floor(parent.curStep / 16)] != null)
+        {
+            if (MasterLevel.SONG.notes[Math.floor(parent.curStep / 16)].altAnim)
+                altAnim = '-alt';
+        }
+
+        parent.rival.playAnim(singAnimations[daNote.noteData] + altAnim, true);
+
+        parent.rival.holdTimer = 0;
+
+        // strumPlayAnim(daNote.noteData);
+
+        if (MasterLevel.SONG.needsVoices)
+            parent.vocals.volume = 1;
+
+        daNote.kill();
+        notes.remove(daNote, true);
+        daNote.destroy();
+    }
+
+    function goodNoteHit(note:Note):Void 
     {
         if (!note.wasGoodHit)
         {
@@ -452,18 +437,8 @@ class Strum
             else
                 parent.health += 0.004;
 
-            switch (note.noteData)
-            {
-                case 0:
-                    parent.boyfriend.playAnim('singLEFT', true);
-                case 1:
-                    parent.boyfriend.playAnim('singDOWN', true);
-                case 2:
-                    parent.boyfriend.playAnim('singUP', true);
-                case 3:
-                    parent.boyfriend.playAnim('singRIGHT', true);
-            }
-
+            parent.boyfriend.playAnim(singAnimations[note.noteData], true);
+            
             strumLineNotes.forEach(function(spr:FlxSprite)
             {
                 if (Math.abs(note.noteData) == spr.ID)
@@ -565,5 +540,12 @@ class StrumNote extends FlxSprite
 
         updateHitbox();
 		scrollFactor.set();
+    }
+
+    public function playAnim(anim:String, force:Bool = false)
+    {
+        animation.play(anim, force);
+		centerOffsets();
+		centerOrigin();
     }
 }

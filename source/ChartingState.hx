@@ -116,7 +116,9 @@ class ChartingState extends MusicBeatState
 				bpm: 150,
 				needsVoices: true,
 				player1: 'bf',
+				girlfriend: 'gf',
 				player2: 'dad',
+				girlrival: 'mom',
 				speed: 1,
 				validScore: false
 			};

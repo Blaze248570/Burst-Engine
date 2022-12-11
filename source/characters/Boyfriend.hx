@@ -7,8 +7,6 @@ class Boyfriend extends Character
 	public var stunned:Bool = false;
 
 	// This doesn't currently serve any purpose, but I believe it will at some point. Probably when I get to improving the strums
-	public var girlfriend:Girlfriend = null;
-
 	public function new(x:Float, y:Float, char:String = 'bf')
 	{
 		super(x, y, char, true);

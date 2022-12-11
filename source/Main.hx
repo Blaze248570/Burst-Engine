@@ -75,6 +75,7 @@ class Main extends Sprite
 
 		#if desktop
 		FlxG.autoPause = false;
+		FlxG.mouse.visible = false;
 		#end
 	}
 }

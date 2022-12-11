@@ -66,8 +66,8 @@ class MasterLevel extends MusicBeatState
 	private static var prevCamFollowPos:FlxObject;
 	public var cameraSpeed:Float = 1; // This'll just stay one for now
 
-	private var rivalStrums:Strum;
-	private var playerStrums:Strum;
+	private var rivalStrums:StrumLine;
+	private var playerStrums:StrumLine;
 
 	public var camZooming:Bool = false;
 	private var curSong:String = "";
@@ -187,8 +187,8 @@ class MasterLevel extends MusicBeatState
 		strumLine = new FlxSprite(0, 50).makeGraphic(FlxG.width, 10);
 		strumLine.scrollFactor.set();
 		
-		playerStrums = new Strum(this, controls);
-		rivalStrums = new Strum(this, controls);
+		playerStrums = new StrumLine(this, controls, boyfriend);
+		rivalStrums = new StrumLine(this, controls, rival);
 
 		generateSong(SONG.song);
 
@@ -333,8 +333,8 @@ class MasterLevel extends MusicBeatState
 		if(girlrivalVersion != null) {
 			girlrival = new Girlrival(0, 0, girlrivalVersion);
 			girlrival.setPosition(girlrival.positionArray[0], girlrival.positionArray[1]);
-			rival.girlrival = girlrival;
-			girlrival.rival = rival;
+			rival.partner = girlrival;
+			girlrival.partner = rival;
 		}
 
 		boyfriend = new Boyfriend(0, 0, bfVersion);
@@ -343,7 +343,8 @@ class MasterLevel extends MusicBeatState
 		gf = new Girlfriend(0, 0, gfVersion);
 		gf.setPosition(gf.positionArray[0] + GF_POS.x, gf.positionArray[1] + GF_POS.y);
 		gf.scrollFactor.set(0.95, 0.95);
-		boyfriend.girlfriend = gf;
+		boyfriend.partner = gf;
+		gf.partner = boyfriend;
 
 		add(gf);
 		if(girlrival != null)
@@ -459,8 +460,8 @@ class MasterLevel extends MusicBeatState
 	{
 		inCutscene = false;
 
-		rivalStrums.generateStaticArrows(0);
-		playerStrums.generateStaticArrows(1);
+		rivalStrums.generateStaticArrows();
+		playerStrums.generateStaticArrows();
 		
 		talking = false;
 		startedCountdown = true;
@@ -624,7 +625,7 @@ class MasterLevel extends MusicBeatState
 				if (songNotes[1] > 3)
 					gottaHitNote = !section.mustHitSection;
 
-				var targetStrum:Strum = (gottaHitNote ? playerStrums : rivalStrums);
+				var targetStrum:StrumLine = (gottaHitNote ? playerStrums : rivalStrums);
 
 				var oldNote:Note;
 				if (targetStrum.unspawnNotes.length > 0)

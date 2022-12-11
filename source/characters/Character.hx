@@ -29,6 +29,8 @@ class Character extends flixel.FlxSprite
 
 	public var missAnimations:Array<Bool> = [false, false, false, false];
 
+	public var partner:Character = null;
+
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
 	{
 		super(x, y);
