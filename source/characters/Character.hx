@@ -29,8 +29,6 @@ class Character extends flixel.FlxSprite
 
 	public var missAnimations:Array<Bool> = [false, false, false, false];
 
-	public var partner:Character = null;
-
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
 	{
 		super(x, y);
@@ -262,6 +260,20 @@ class Character extends flixel.FlxSprite
 					{anim: 'singRIGHT', name: 'Pico NOTE LEFT0', fps: 24, loop: false, indices: [], offsets: [-68, -7]},
 					{anim: 'singRIGHTmiss', name: 'Pico NOTE LEFT miss', fps: 24, loop: false, indices: [], offsets: [-60, 41]}
 				];
+
+				if(isPlayer) {
+					animationData = [
+						{anim: 'idle', name: 'Pico Idle Dance', fps: 24, loop: false, indices: [], offsets: [3, 0]},
+						{anim: 'singLEFT', name: 'Pico NOTE LEFT0', fps: 24, loop: false, indices: [], offsets: [85, -10]},
+						{anim: 'singLEFTmiss', name: 'Pico NOTE LEFT miss', fps: 24, loop: false, indices: [], offsets: [83, 28]},
+						{anim: 'singDOWN', name: 'Pico Down Note0', fps: 24, loop: false, indices: [], offsets: [84, -80]},
+						{anim: 'singDOWNmiss', name: 'Pico Down Note MISS', fps: 24, loop: false, indices: [], offsets: [80, -38]},
+						{anim: 'singUP', name: 'pico Up note0', fps: 24, loop: false, indices: [], offsets: [21, 27]},
+						{anim: 'singUPmiss', name: 'pico Up note miss', fps: 24, loop: false, indices: [], offsets: [28, 67]},
+						{anim: 'singRIGHT', name: 'Pico Note Right0', fps: 24, loop: false, indices: [], offsets: [-48, 2]},
+						{anim: 'singRIGHTmiss', name: 'Pico Note Right Miss', fps: 24, loop: false, indices: [], offsets: [-45, 50]}
+					];
+				}
 
 			case 'mom' | 'mom-car':
 				frames = Paths.getSparrowAtlas(curCharacter == 'mom-car' ? 'momCar' : 'Mom_Assets');

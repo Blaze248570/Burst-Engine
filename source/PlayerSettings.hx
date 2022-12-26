@@ -123,6 +123,17 @@ class PlayerSettings
 				throw 'Unexpected null gamepad. id:0';
 
 			player2.settings.controls.addDefaultGamepad(1);
+		} 
+		else
+		{
+			if(player2 == null)
+			{
+				// This should suffice for now
+				// player2 = new BotPlayer();
+
+				player2 = new Player();
+				player2.settings = new PlayerSettings(1, None);
+			}
 		}
 
 		// DeviceManager.init();

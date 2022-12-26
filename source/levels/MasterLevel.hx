@@ -49,12 +49,15 @@ class MasterLevel extends MusicBeatState
 	public static var daPixelZoom:Float = 6;
 	public static var isPixelLevel:Bool = false;
 
+	private var player1:Player = PlayerSettings.player1;
+	private var player2:Player = PlayerSettings.player2;
+
 	public var vocals:FlxSound;
 	
 	public var gf:Girlfriend = null;
 	public var boyfriend:Boyfriend = null;
-	public var rival:Rival = null;
-	public var girlrival:Girlrival = null;
+	public var rival:Boyfriend = null;
+	public var girlrival:Girlfriend = null;
 
 	public var strumLine:FlxSprite;
 	private var curSection:Int = 0;
@@ -65,9 +68,6 @@ class MasterLevel extends MusicBeatState
 	private static var prevCamFollow:FlxPoint;
 	private static var prevCamFollowPos:FlxObject;
 	public var cameraSpeed:Float = 1; // This'll just stay one for now
-
-	private var rivalStrums:StrumLine;
-	private var playerStrums:StrumLine;
 
 	public var camZooming:Bool = false;
 	private var curSong:String = "";
@@ -186,22 +186,20 @@ class MasterLevel extends MusicBeatState
 
 		strumLine = new FlxSprite(0, 50).makeGraphic(FlxG.width, 10);
 		strumLine.scrollFactor.set();
-		
-		playerStrums = new StrumLine(this, controls, boyfriend);
-		rivalStrums = new StrumLine(this, controls, rival);
 
-		generateSong(SONG.song);
+		player1.strumLine = new StrumLine(this, controls, boyfriend);
+		player2.strumLine = new StrumLine(this, controls, rival);
 
 		// add(strumLine);
 
+		generateSong(SONG.song);
+
 		FlxG.worldBounds.set(0, 0, FlxG.width, FlxG.height);
 
-		// NOTE: Make sure this isn't a liability
 		FlxG.fixedTimestep = false;
 
 		generateHUD();
 
-		// cameras = [FlxG.cameras.list[1]];
 		startingSong = true;
 
 		if (isStoryMode)
@@ -297,21 +295,24 @@ class MasterLevel extends MusicBeatState
 	/**
 		Helper function used by `create()` to instantiate and draw the characters.
 			
-		Subclasses may override this, but it is suggested that it is left alone.
-		If you'd simply like to alter a character's data, first call `super.createCharacters()` and change whatever variable like such:
+		Subclasses may override this, but it is *HIGHLY* suggested that it is left alone as programming associated with the `PlayerSettings` class lies here.
+		
+		If you'd simply like to alter a character's data, first override the function, then call `super.createCharacters()`, then change whatever variable like such:
 		
 		`boyfriend.x = 420`
-
+		
 		@param bfVersion        Optional parameter to override the `SONG.player1` variable
 		@param gfVersion        Optional parameter to set gf to be something other than gf
 		@param rivalVersion     Optional parameter to override the `SONG.player2` variable
 		@param girlrivalVersion Optional parameter to have a second gf which corrosponds to the rival instead of the boyfriend
 	 */ 
-	function createCharacters(bfVersion:String = null, gfVersion:String = null, rivalVersion:String = null, girlrivalVersion:String = null) {
+	function createCharacters(bfVersion:String = null, gfVersion:String = null, rivalVersion:String = null, girlrivalVersion:String = null):Void
+	{
 		if(bfVersion == null)
 			bfVersion = SONG.player1;
 
-		if(gfVersion == null)
+		if(gfVersion == null) 
+		{
 			switch (curStage)
 			{
 				case 'limo':
@@ -323,32 +324,38 @@ class MasterLevel extends MusicBeatState
 				default:
 					gfVersion = 'gf';
 			}
+		}
 
 		if(rivalVersion == null)
 			rivalVersion = SONG.player2;
 
-		rival = new Rival(0, 0, rivalVersion);
+		PlayerSettings.player1.loadSprite(bfVersion);
+		boyfriend = PlayerSettings.player1.sprite;
+		boyfriend.setPosition(boyfriend.positionArray[0] + BF_POS.x, boyfriend.positionArray[1] + BF_POS.y);
+
+		if(gfVersion != null) {
+			PlayerSettings.player1.addPartner(gfVersion);
+			gf = PlayerSettings.player1.partner;
+			gf.setPosition(gf.positionArray[0] + GF_POS.x, gf.positionArray[1] + GF_POS.y);
+			gf.scrollFactor.set(0.95, 0.95);
+		}
+
+		PlayerSettings.player2.loadSprite(rivalVersion);
+		rival = PlayerSettings.player2.sprite;
 		rival.setPosition(rival.positionArray[0] + RIVAL_POS.x, rival.positionArray[1] + RIVAL_POS.y);
 
 		if(girlrivalVersion != null) {
-			girlrival = new Girlrival(0, 0, girlrivalVersion);
+			PlayerSettings.player2.addPartner(girlrivalVersion);
+			girlrival = PlayerSettings.player2.partner;
 			girlrival.setPosition(girlrival.positionArray[0], girlrival.positionArray[1]);
-			rival.partner = girlrival;
-			girlrival.partner = rival;
 		}
 
-		boyfriend = new Boyfriend(0, 0, bfVersion);
-		boyfriend.setPosition(boyfriend.positionArray[0] + BF_POS.x, boyfriend.positionArray[1] + BF_POS.y);
+		if(gf != null)
+			add(gf);
 
-		gf = new Girlfriend(0, 0, gfVersion);
-		gf.setPosition(gf.positionArray[0] + GF_POS.x, gf.positionArray[1] + GF_POS.y);
-		gf.scrollFactor.set(0.95, 0.95);
-		boyfriend.partner = gf;
-		gf.partner = boyfriend;
-
-		add(gf);
 		if(girlrival != null)
 			add(girlrival);
+
 		add(rival);
 		add(boyfriend);
 	}
@@ -460,8 +467,8 @@ class MasterLevel extends MusicBeatState
 	{
 		inCutscene = false;
 
-		rivalStrums.generateStaticArrows();
-		playerStrums.generateStaticArrows();
+		player1.strumLine.generateStaticArrows();
+		player2.strumLine.generateStaticArrows();
 		
 		talking = false;
 		startedCountdown = true;
@@ -625,7 +632,7 @@ class MasterLevel extends MusicBeatState
 				if (songNotes[1] > 3)
 					gottaHitNote = !section.mustHitSection;
 
-				var targetStrum:StrumLine = (gottaHitNote ? playerStrums : rivalStrums);
+				var targetStrum:StrumLine = (gottaHitNote ? player1.strumLine : player2.strumLine);
 
 				var oldNote:Note;
 				if (targetStrum.unspawnNotes.length > 0)
@@ -667,8 +674,8 @@ class MasterLevel extends MusicBeatState
 		// trace(unspawnNotes.length);
 		// playerCounter += 1;
 
-		playerStrums.unspawnNotes.sort(sortByShit);
-		rivalStrums.unspawnNotes.sort(sortByShit);
+		player1.strumLine.unspawnNotes.sort(sortByShit);
+		player2.strumLine.unspawnNotes.sort(sortByShit);
 
 		generatedMusic = true;
 	}
@@ -1095,8 +1102,8 @@ class MasterLevel extends MusicBeatState
 			#end
 		}
 
-		playerStrums.update(elapsed);
-		rivalStrums.update(elapsed);
+		player1.strumLine.update(elapsed);
+		player2.strumLine.update(elapsed);
 
 		#if debug
 		if (FlxG.keys.justPressed.ONE)
@@ -1343,8 +1350,8 @@ class MasterLevel extends MusicBeatState
 
 		if (generatedMusic)
 		{
-			playerStrums.notes.sort(FlxSort.byY, FlxSort.DESCENDING);
-			rivalStrums.notes.sort(FlxSort.byY, FlxSort.DESCENDING);
+			player1.strumLine.notes.sort(FlxSort.byY, FlxSort.DESCENDING);
+			player2.strumLine.notes.sort(FlxSort.byY, FlxSort.DESCENDING);
 		}
 
 		if (SONG.notes[Math.floor(curStep / 16)] != null)

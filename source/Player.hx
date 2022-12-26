@@ -11,7 +11,8 @@ import openfl.events.KeyboardEvent;
 
 class Player
 {
-    static var idEnumerator = 1;
+    static var idEnumerator:Int = 1;
+
     #if (haxe > "4.0.0")
     public final playerNum:Int = idEnumerator++;
     #else
@@ -23,7 +24,8 @@ class Player
     public var curState:MusicBeatState = null;
     public var curLevel:MasterLevel = null;
 
-    public var sprite:Character = null;
+    public var sprite:Boyfriend = null;
+    public var partner:Girlfriend = null;
     public var strumLine:StrumLine = null;
 
     public function new()
@@ -34,36 +36,27 @@ class Player
         }
     }
 
-    private function loadSprite():Void
+    public function loadSprite(sprite:String):Void 
     {
-        switch(playerNum) {
-            case 1:
-                this.sprite = new Rival(0, 0, MasterLevel.SONG.player2);
+        this.sprite = new Boyfriend(0, 0, sprite, playerNum == 1);
+    }
 
-                if(MasterLevel.SONG.girlrival != null)
-                    this.sprite.partner = new Girlrival(0, 0, MasterLevel.SONG.girlrival);
-
-            case 2:
-                this.sprite = new Boyfriend(0, 0, MasterLevel.SONG.player1);
-
-                if(MasterLevel.SONG.girlfriend != null)
-                    this.sprite.partner = new Girlfriend(0, 0, MasterLevel.SONG.girlfriend);
-        }
-
-        strumLine = new StrumLine(curLevel, curState.controls, sprite);
+    public function addPartner(sprite:String):Void
+    {
+        this.partner = new Girlfriend(0, 0, sprite, playerNum == 1);
     }
 
     public function trackKeys():Void
     {
-
+        
     }
 
-    function onKeyPress(event:KeyboardEvent):Void 
+    private function onKeyPress(event:KeyboardEvent):Void 
     {
         
     }
 
-	function onKeyRelease(event:KeyboardEvent):Void 
+	private function onKeyRelease(event:KeyboardEvent):Void 
     {
 
     }

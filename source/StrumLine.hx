@@ -114,7 +114,7 @@ class StrumLine
                     (!daNote.mustPress || (daNote.wasGoodHit || (daNote.prevNote.wasGoodHit && !daNote.canBeHit)))
                 )
                 {
-                    var swagRect = new FlxRect(0, parent.strumLine.y + Note.swagWidth / 2 - daNote.y, daNote.width * 2, daNote.height * 2);
+                    var swagRect:FlxRect = new FlxRect(0, parent.strumLine.y + Note.swagWidth / 2 - daNote.y, daNote.width * 2, daNote.height * 2);
                     swagRect.y /= daNote.scale.y;
                     swagRect.height -= swagRect.y;
 
