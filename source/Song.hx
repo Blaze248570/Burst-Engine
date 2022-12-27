@@ -16,7 +16,9 @@ typedef SwagSong =
 	var speed:Float;
 
 	var player1:String;
+	var girlfriend:String;
 	var player2:String;
+	var girlrival:String;
 	var validScore:Bool;
 }
 

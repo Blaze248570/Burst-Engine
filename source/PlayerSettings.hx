@@ -1,48 +1,23 @@
 package;
 
 import Controls;
-import flixel.FlxCamera;
 import flixel.FlxG;
-import flixel.util.FlxSignal;
+import flixel.util.FlxSignal.FlxTypedSignal;
 
-// import ui.DeviceManager;
-// import props.Player;
 class PlayerSettings
 {
-	static public var numPlayers(default, null) = 0;
-	static public var numAvatars(default, null) = 0;
-	static public var player1(default, null):PlayerSettings;
-	static public var player2(default, null):PlayerSettings;
+	static public var numPlayers(default, null):Int = 0;
+	static public var numAvatars(default, null):Int = 0;
+	static public var player1(default, null):Player;
+	static public var player2(default, null):Player;
 
 	#if (haxe >= "4.0.0")
-	static public final onAvatarAdd = new FlxTypedSignal<PlayerSettings->Void>();
-	static public final onAvatarRemove = new FlxTypedSignal<PlayerSettings->Void>();
+	static public final onAvatarAdd:FlxTypedSignal<PlayerSettings->Void> = new FlxTypedSignal();
+	static public final onAvatarRemove:FlxTypedSignal<PlayerSettings->Void> = new FlxTypedSignal();
 	#else
-	static public var onAvatarAdd = new FlxTypedSignal<PlayerSettings->Void>();
-	static public var onAvatarRemove = new FlxTypedSignal<PlayerSettings->Void>();
+	static public var onAvatarAdd:FlxTypedSignal<PlayerSettings->Void> = new FlxTypedSignal();
+	static public var onAvatarRemove:FlxTypedSignal<PlayerSettings->Void> = new FlxTypedSignal();
 	#end
-
-	public var id(default, null):Int;
-
-	#if (haxe >= "4.0.0")
-	public final controls:Controls;
-	#else
-	public var controls:Controls;
-	#end
-
-	// public var avatar:Player;
-	// public var camera(get, never):PlayCamera;
-
-	function new(id, scheme)
-	{
-		this.id = id;
-		this.controls = new Controls('player$id', scheme);
-	}
-
-	public function setKeyboardScheme(scheme)
-	{
-		controls.setKeyboardScheme(scheme);
-	}
 
 	/* 
 		static public function addAvatar(avatar:Player):PlayerSettings
@@ -94,7 +69,7 @@ class PlayerSettings
 			{
 				settings = player2;
 				if (player1.controls.keyboardScheme.match(Duo(_)))
-					player1.setKeyboardScheme(Solo);
+					player1.controls.setKeyboardScheme(scheme);
 			}
 			else
 				throw "Cannot remove avatar that is not for a player";
@@ -113,13 +88,14 @@ class PlayerSettings
 
 			onAvatarRemove.dispatch(avatar.settings);
 		}
+	*/
 
-	 */
 	static public function init():Void
 	{
 		if (player1 == null)
 		{
-			player1 = new PlayerSettings(0, Solo);
+			player1 = new Player();
+			player1.settings = new PlayerSettings(0, Solo);
 			++numPlayers;
 		}
 
@@ -130,14 +106,15 @@ class PlayerSettings
 			if (gamepad == null)
 				throw 'Unexpected null gamepad. id:0';
 
-			player1.controls.addDefaultGamepad(0);
+			player1.settings.controls.addDefaultGamepad(0);
 		}
 
 		if (numGamepads > 1)
 		{
 			if (player2 == null)
 			{
-				player2 = new PlayerSettings(1, None);
+				player2 = new Player();
+				player2.settings = new PlayerSettings(1, None);
 				++numPlayers;
 			}
 
@@ -145,7 +122,18 @@ class PlayerSettings
 			if (gamepad == null)
 				throw 'Unexpected null gamepad. id:0';
 
-			player2.controls.addDefaultGamepad(1);
+			player2.settings.controls.addDefaultGamepad(1);
+		} 
+		else
+		{
+			if(player2 == null)
+			{
+				// This should suffice for now
+				// player2 = new BotPlayer();
+
+				player2 = new Player();
+				player2.settings = new PlayerSettings(1, None);
+			}
 		}
 
 		// DeviceManager.init();
@@ -156,5 +144,22 @@ class PlayerSettings
 		player1 = null;
 		player2 = null;
 		numPlayers = 0;
+	}
+
+	public var id(default, null):Int;
+
+	#if (haxe >= "4.0.0")
+	public final controls:Controls;
+	#else
+	public var controls:Controls;
+	#end
+
+	// public var avatar:Player;
+	// public var camera(get, never):PlayCamera;
+
+	function new(id, scheme)
+	{
+		this.id = id;
+		this.controls = new Controls('player$id', scheme);
 	}
 }

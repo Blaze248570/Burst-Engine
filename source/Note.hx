@@ -4,9 +4,8 @@ import flixel.FlxSprite;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.math.FlxMath;
 import flixel.util.FlxColor;
-#if polymod
-import polymod.format.ParseRules.TargetSignatureElement;
-#end
+
+import levels.MasterLevel;
 
 using StringTools;
 
@@ -34,7 +33,7 @@ class Note extends FlxSprite
 
 	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false)
 	{
-		super();
+		super(50, -2000); // MAKE SURE ITS DEFINITELY OFF SCREEN?
 
 		if (prevNote == null)
 			prevNote = this;
@@ -42,16 +41,10 @@ class Note extends FlxSprite
 		this.prevNote = prevNote;
 		isSustainNote = sustainNote;
 
-		x += 50;
-		// MAKE SURE ITS DEFINITELY OFF SCREEN?
-		y -= 2000;
 		this.strumTime = strumTime;
-
 		this.noteData = noteData;
 
-		var daStage:String = PlayState.curStage;
-
-		switch (daStage)
+		switch (MasterLevel.curStage)
 		{
 			case 'school' | 'schoolEvil':
 				loadGraphic(Paths.image('weeb/pixelUI/arrows-pixels'), true, 17, 17);
@@ -76,7 +69,7 @@ class Note extends FlxSprite
 					animation.add('bluehold', [1]);
 				}
 
-				setGraphicSize(Std.int(width * PlayState.daPixelZoom));
+				setGraphicSize(Std.int(width * MasterLevel.daPixelZoom));
 				updateHitbox();
 
 			default:
@@ -118,8 +111,6 @@ class Note extends FlxSprite
 				animation.play('redScroll');
 		}
 
-		// trace(prevNote);
-
 		if (isSustainNote && prevNote != null)
 		{
 			noteScore * 0.2;
@@ -143,7 +134,7 @@ class Note extends FlxSprite
 
 			x -= width / 2;
 
-			if (PlayState.curStage.startsWith('school'))
+			if (MasterLevel.curStage.startsWith('school'))
 				x += 30;
 
 			if (prevNote.isSustainNote)
@@ -160,13 +151,15 @@ class Note extends FlxSprite
 						prevNote.animation.play('redhold');
 				}
 
-				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.5 * PlayState.SONG.speed;
+				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.5 * MasterLevel.SONG.speed;
 				prevNote.updateHitbox();
-				// prevNote.setGraphicSize();
 			}
 		}
 	}
 
+	/**
+		Tracks note progression and position, marking them as invalid if they're too late.	
+	**/
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);

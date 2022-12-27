@@ -47,16 +47,9 @@ class Highscore
 		FlxG.save.flush();
 	}
 
-	public static function formatSong(song:String, diff:Int):String
+	inline public static function formatSong(song:String, diff:Int):String
 	{
-		var daSong:String = song;
-
-		if (diff == 0)
-			daSong += '-easy';
-		else if (diff == 2)
-			daSong += '-hard';
-
-		return daSong;
+		return song + (diff == 0 ? "-easy" : diff == 2 ? "-hard" : "");
 	}
 
 	public static function getScore(song:String, diff:Int):Int

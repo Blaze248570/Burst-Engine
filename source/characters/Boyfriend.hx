@@ -1,9 +1,4 @@
-package;
-
-import flixel.FlxG;
-import flixel.FlxSprite;
-import flixel.graphics.frames.FlxAtlasFrames;
-import flixel.util.FlxTimer;
+package characters;
 
 using StringTools;
 
@@ -11,12 +6,12 @@ class Boyfriend extends Character
 {
 	public var stunned:Bool = false;
 
-	public function new(x:Float, y:Float, ?char:String = 'bf')
+	public function new(x:Float, y:Float, char:String = 'bf', isPlayer:Bool = true)
 	{
-		super(x, y, char, true);
+		super(x, y, char, isPlayer);
 	}
 
-	override function update(elapsed:Float)
+	override function update(elapsed:Float):Void
 	{
 		if (!debugMode)
 		{

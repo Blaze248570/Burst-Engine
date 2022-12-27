@@ -1,19 +1,19 @@
 package;
 
-import lime.app.Promise;
-import lime.app.Future;
 import flixel.FlxG;
-import flixel.FlxState;
 import flixel.FlxSprite;
-import flixel.graphics.frames.FlxAtlasFrames;
-import flixel.util.FlxTimer;
-
-import openfl.utils.Assets;
-import lime.utils.Assets as LimeAssets;
-import lime.utils.AssetLibrary;
-import lime.utils.AssetManifest;
+import flixel.FlxState;
 
 import haxe.io.Path;
+
+import levels.MasterLevel;
+
+import lime.app.Promise;
+import lime.app.Future;
+import lime.utils.Assets as LimeAssets;
+import lime.utils.AssetLibrary;
+
+import openfl.utils.Assets;
 
 class LoadingState extends MusicBeatState
 {
@@ -60,17 +60,17 @@ class LoadingState extends MusicBeatState
 				callbacks = new MultiCallback(onLoad);
 				var introComplete = callbacks.add("introComplete");
 				checkLoadSong(getSongPath());
-				if (PlayState.SONG.needsVoices)
+				if (MasterLevel.SONG.needsVoices)
 					checkLoadSong(getVocalPath());
 				checkLibrary("shared");
-				if (PlayState.storyWeek > 0)
-					checkLibrary("week" + PlayState.storyWeek);
+				if (MasterLevel.storyWeek > 0)
+					checkLibrary("week" + MasterLevel.storyWeek);
 				else
 					checkLibrary("tutorial");
 				
 				var fadeTime = 0.5;
 				FlxG.camera.fade(FlxG.camera.bgColor, fadeTime, true);
-				new FlxTimer().start(fadeTime + MIN_TIME, function(_) introComplete());
+				new flixel.util.FlxTimer().start(fadeTime + MIN_TIME, function(_) introComplete());
 			}
 		);
 	}
@@ -134,14 +134,14 @@ class LoadingState extends MusicBeatState
 		FlxG.switchState(target);
 	}
 	
-	static function getSongPath()
+	static function getSongPath():String
 	{
-		return Paths.inst(PlayState.SONG.song);
+		return 'songs:assets/songs/${MasterLevel.SONG.song.toLowerCase()}/Inst.${Paths.SOUND_EXT}';
 	}
 	
-	static function getVocalPath()
+	static function getVocalPath():String
 	{
-		return Paths.voices(PlayState.SONG.song);
+		return 'songs:assets/songs/${MasterLevel.SONG.song.toLowerCase()}/Voices.${Paths.SOUND_EXT}';
 	}
 	
 	inline static public function loadAndSwitchState(target:FlxState, stopMusic = false)
@@ -151,10 +151,10 @@ class LoadingState extends MusicBeatState
 	
 	static function getNextState(target:FlxState, stopMusic = false):FlxState
 	{
-		Paths.setCurrentLevel("week" + PlayState.storyWeek);
+		Paths.setCurrentLevel("week" + MasterLevel.storyWeek);
 		#if NO_PRELOAD_ALL
 		var loaded = isSoundLoaded(getSongPath())
-			&& (!PlayState.SONG.needsVoices || isSoundLoaded(getVocalPath()))
+			&& (!MasterLevel.SONG.needsVoices || isSoundLoaded(getVocalPath()))
 			&& isLibraryLoaded("shared");
 		
 		if (!loaded)
@@ -222,7 +222,7 @@ class LoadingState extends MusicBeatState
 			path = LimeAssets.__cacheBreak(path);
 		}
 
-		AssetManifest.loadFromFile(path, rootPath).onComplete(function(manifest)
+		openfl.utils.AssetManifest.loadFromFile(path, rootPath).onComplete(function(manifest)
 		{
 			if (manifest == null)
 			{
