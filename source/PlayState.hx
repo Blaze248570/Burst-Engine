@@ -1,11 +1,9 @@
-package levels;
+package;
 
 import characters.*;
 #if desktop
 import Discord.DiscordClient;
 #end
-import Section.SwagSection;
-import Song.SwagSong;
 
 import flixel.FlxCamera;
 import flixel.FlxG;
@@ -13,10 +11,9 @@ import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.FlxSubState;
 import flixel.addons.transition.FlxTransitionableState;
-import flixel.group.FlxGroup.FlxTypedGroup;
+// import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
-import flixel.math.FlxRect;
 import flixel.system.FlxSound;
 import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
@@ -26,19 +23,21 @@ import flixel.util.FlxColor;
 import flixel.util.FlxSort;
 import flixel.util.FlxTimer;
 
+import Section.SwagSection;
+import Song.SwagSong;
+
 using StringTools;
 
-// I'd just like to say, needlessly importing classes is sloppy and it DOES affect performance. 
-// For Java it does at least.
+// I'd just like to say, needlessly importing classes is sloppy. 
 // Don't import things that aren't needed.
 
 /**
 	The main "game state" where all the action happens
 
 	You can make a stage within the `createStage()` function with a `switch` or 
-	you can extend this class and override the same function if you're into organization
+	you can extend this class and override the same function if you're into organization like me ^~^
  */
-class MasterLevel extends MusicBeatState
+class PlayState extends MusicBeatState
 {
 	public static var curStage:String = '';
 	public static var SONG:SwagSong;
@@ -112,7 +111,7 @@ class MasterLevel extends MusicBeatState
 	#end
 
 	/**
-		Function used by the `MasterLevel` to draw the stage, characters, and cameras, as well as load the song
+		Function used by the `PlayState` to draw the stage, characters, and cameras, as well as load the song
 
 		It is *highly* recommended that child classes do not override this function and instead override one of its helper functions such as:
 		* `createStage()`
@@ -137,6 +136,11 @@ class MasterLevel extends MusicBeatState
 		persistentUpdate = true;
 		persistentDraw = true;
 		isPixelLevel = false;
+
+		player1.curLevel = this;
+		player1.enter_level();
+		player2.curLevel = this;
+		player2.enter_level();
 
 		if (SONG == null)
 			SONG = Song.loadFromJson('tutorial');
@@ -187,8 +191,8 @@ class MasterLevel extends MusicBeatState
 		strumLine = new FlxSprite(0, 50).makeGraphic(FlxG.width, 10);
 		strumLine.scrollFactor.set();
 
-		player1.strumLine = new StrumLine(this, controls, boyfriend);
-		player2.strumLine = new StrumLine(this, controls, rival);
+		player1.strumLine = new StrumLine(player1);
+		player2.strumLine = new StrumLine(player2);
 
 		// add(strumLine);
 
@@ -329,24 +333,24 @@ class MasterLevel extends MusicBeatState
 		if(rivalVersion == null)
 			rivalVersion = SONG.player2;
 
-		PlayerSettings.player1.loadSprite(bfVersion);
-		boyfriend = PlayerSettings.player1.sprite;
+		player1.loadSprite(bfVersion);
+		boyfriend = player1.sprite;
 		boyfriend.setPosition(boyfriend.positionArray[0] + BF_POS.x, boyfriend.positionArray[1] + BF_POS.y);
 
 		if(gfVersion != null) {
-			PlayerSettings.player1.addPartner(gfVersion);
-			gf = PlayerSettings.player1.partner;
+			player1.addPartner(gfVersion);
+			gf = player1.partner;
 			gf.setPosition(gf.positionArray[0] + GF_POS.x, gf.positionArray[1] + GF_POS.y);
 			gf.scrollFactor.set(0.95, 0.95);
 		}
 
-		PlayerSettings.player2.loadSprite(rivalVersion);
-		rival = PlayerSettings.player2.sprite;
+		player2.loadSprite(rivalVersion);
+		rival = player2.sprite;
 		rival.setPosition(rival.positionArray[0] + RIVAL_POS.x, rival.positionArray[1] + RIVAL_POS.y);
 
 		if(girlrivalVersion != null) {
-			PlayerSettings.player2.addPartner(girlrivalVersion);
-			girlrival = PlayerSettings.player2.partner;
+			player2.addPartner(girlrivalVersion);
+			girlrival = player2.partner;
 			girlrival.setPosition(girlrival.positionArray[0], girlrival.positionArray[1]);
 		}
 
@@ -641,12 +645,14 @@ class MasterLevel extends MusicBeatState
 					oldNote = null;
 
 				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote);
+				swagNote.x = targetStrum.strumLineNotes.members[daNoteData].x;
+				swagNote.parentStrum = targetStrum;
 				swagNote.sustainLength = songNotes[2];
-				swagNote.scrollFactor.set(0, 0);
+				swagNote.scrollFactor.set();
 
 				var susLength:Float = swagNote.sustainLength;
-
 				susLength = susLength / Conductor.stepCrochet;
+
 				targetStrum.unspawnNotes.push(swagNote);
 
 				for (susNote in 0...Math.floor(susLength))
@@ -654,19 +660,16 @@ class MasterLevel extends MusicBeatState
 					oldNote = targetStrum.unspawnNotes[Std.int(targetStrum.unspawnNotes.length - 1)];
 
 					var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote) + Conductor.stepCrochet, daNoteData, oldNote, true);
+					sustainNote.x = (targetStrum.strumLineNotes.members[daNoteData].x + (Note.swagWidth / 2) - (sustainNote.width / 2));
+					sustainNote.parentStrum = targetStrum;
 					sustainNote.scrollFactor.set();
+
 					targetStrum.unspawnNotes.push(sustainNote);
 
 					sustainNote.mustPress = gottaHitNote;
-
-					if (sustainNote.mustPress)
-						sustainNote.x += FlxG.width / 2; // general offset
 				}
 
 				swagNote.mustPress = gottaHitNote;
-
-				if (swagNote.mustPress)
-					swagNote.x += FlxG.width / 2; // general offset
 			}
 			daBeats++;
 		}
@@ -724,7 +727,7 @@ class MasterLevel extends MusicBeatState
 		{
 			camFollow.set(rival.getMidpoint().x + 150, rival.getMidpoint().y - 100);
 			camFollow.x += rival.cameraPosition[0];// + opponentCameraOffset[0];
-			camFollow.y += rival.cameraPosition[1]; //+ opponentCameraOffset[1];
+			camFollow.y += rival.cameraPosition[1];// + opponentCameraOffset[1];
 			tweenCamIn();
 		}
 		else
@@ -847,8 +850,8 @@ class MasterLevel extends MusicBeatState
 		vocals.play();
 	}
 
-	private var paused:Bool = false;
-	var startedCountdown:Bool = false;
+	public var paused:Bool = false;
+	public var startedCountdown:Bool = false;
 	var canPause:Bool = true;
 
 	override public function update(elapsed:Float)
@@ -969,7 +972,7 @@ class MasterLevel extends MusicBeatState
 			/*
 				if (curBeat % 4 == 0)
 				{
-					trace(MasterLevel.SONG.notes[Std.int(curStep / 16)].mustHitSection);
+					trace(PlayState.SONG.notes[Std.int(curStep / 16)].mustHitSection);
 				}
 			*/
 
@@ -1064,7 +1067,7 @@ class MasterLevel extends MusicBeatState
 				case 128, 129, 130:
 					vocals.volume = 0;
 					// FlxG.sound.music.stop();
-					// FlxG.switchState(new MasterLevel());
+					// FlxG.switchState(new PlayState());
 			}
 		}
 		// better streaming of shit
@@ -1122,6 +1125,9 @@ class MasterLevel extends MusicBeatState
 			Highscore.saveScore(SONG.song, songScore, storyDifficulty);
 			#end
 		}
+
+		player1.exit_level();
+		player2.exit_level();
 
 		if (isStoryMode)
 		{

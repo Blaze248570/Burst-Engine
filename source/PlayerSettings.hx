@@ -1,7 +1,9 @@
 package;
 
 import Controls;
+
 import flixel.FlxG;
+import flixel.input.keyboard.FlxKey;
 import flixel.util.FlxSignal.FlxTypedSignal;
 
 class PlayerSettings
@@ -18,6 +20,25 @@ class PlayerSettings
 	static public var onAvatarAdd:FlxTypedSignal<PlayerSettings->Void> = new FlxTypedSignal();
 	static public var onAvatarRemove:FlxTypedSignal<PlayerSettings->Void> = new FlxTypedSignal();
 	#end
+
+	public static var uiKeyBinds:Map<String, Array<FlxKey>> = [
+		'ui_left'		=> [A, LEFT],
+		'ui_down'		=> [S, DOWN],
+		'ui_up'			=> [W, UP],
+		'ui_right'		=> [D, RIGHT],
+		
+		'accept'		=> [SPACE, ENTER],
+		'back'			=> [BACKSPACE, ESCAPE],
+		'pause'			=> [ENTER, ESCAPE],
+		'reset'			=> [R],
+		
+		'volume_mute'	=> [ZERO],
+		'volume_up'		=> [NUMPADPLUS, PLUS],
+		'volume_down'	=> [NUMPADMINUS, MINUS],
+		
+		'debug_1'		=> [SEVEN],
+		'debug_2'		=> [EIGHT]
+	];
 
 	/* 
 		static public function addAvatar(avatar:Player):PlayerSettings
@@ -95,6 +116,7 @@ class PlayerSettings
 		if (player1 == null)
 		{
 			player1 = new Player();
+			player1.cpucontrolled = false;
 			player1.settings = new PlayerSettings(0, Solo);
 			++numPlayers;
 		}
@@ -114,6 +136,7 @@ class PlayerSettings
 			if (player2 == null)
 			{
 				player2 = new Player();
+				player2.cpucontrolled = false;
 				player2.settings = new PlayerSettings(1, None);
 				++numPlayers;
 			}
@@ -128,9 +151,6 @@ class PlayerSettings
 		{
 			if(player2 == null)
 			{
-				// This should suffice for now
-				// player2 = new BotPlayer();
-
 				player2 = new Player();
 				player2.settings = new PlayerSettings(1, None);
 			}

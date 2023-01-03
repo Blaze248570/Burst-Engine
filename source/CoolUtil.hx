@@ -8,7 +8,7 @@ class CoolUtil
 
 	public static function difficultyString():String
 	{
-		return difficultyArray[levels.MasterLevel.storyDifficulty];
+		return difficultyArray[PlayState.storyDifficulty];
 	}
 
 	// Cred to ShadowMario

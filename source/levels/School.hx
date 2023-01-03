@@ -11,20 +11,20 @@ import flixel.util.FlxTimer;
 
 // import WiggleEffect.WiggleEffectType;
 
-class School extends MasterLevel 
+class School extends PlayState 
 {
     var bgGirls:BackgroundGirls = null;
 	var wiggleShit:WiggleEffect = null;
 
     override public function createStage() {
-        var curSong:String = Paths.formatToSongPath(MasterLevel.SONG.song);
+        var curSong:String = Paths.formatToSongPath(PlayState.SONG.song);
 
-        MasterLevel.isPixelLevel = true;
+        PlayState.isPixelLevel = true;
         BF_POS.set(970, 320);
         GF_POS.set(580, 430);
 
         if(curSong == "thorns") {
-            MasterLevel.curStage = 'schoolEvil';
+            PlayState.curStage = 'schoolEvil';
 
             // var waveEffectBG = new FlxWaveEffect(FlxWaveMode.ALL, 2, -1, 3, 2);
             // var waveEffectFG = new FlxWaveEffect(FlxWaveMode.ALL, 2, -1, 5, 2);
@@ -83,7 +83,7 @@ class School extends MasterLevel
                 add(waveSpriteFG);
             */
         } else {
-            MasterLevel.curStage = 'school';
+            PlayState.curStage = 'school';
 
             // defaultCamZoom = 0.9;
             var bgSky:BGSprite = new BGSprite('weeb/weebSky', 0, 0, 0.1, 0.1);
@@ -136,7 +136,7 @@ class School extends MasterLevel
             if (curSong == 'roses')
                 bgGirls.getScared();
 
-            bgGirls.setGraphicSize(Std.int(bgGirls.width * MasterLevel.daPixelZoom));
+            bgGirls.setGraphicSize(Std.int(bgGirls.width * PlayState.daPixelZoom));
             bgGirls.updateHitbox();
             bgGirls.antialiasing = false;
             add(bgGirls);
