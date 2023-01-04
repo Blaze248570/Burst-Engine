@@ -119,8 +119,8 @@ class Note extends FlxSprite
 	}
 
 	/**
-		Tracks note progression and position, marking them as invalid if they're too late.	
-	**/
+		Tracks note progression and position, marking them as hittable and too late.	
+	 */
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
