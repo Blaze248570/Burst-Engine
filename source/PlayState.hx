@@ -487,7 +487,7 @@ class PlayState extends MusicBeatState
 		{
 			rival.dance();
 			gf.dance();
-			boyfriend.playAnim('idle');
+			boyfriend.dance();
 
 			var introAlts:Array<String> = (isPixelLevel) 
 			  ? (
@@ -969,66 +969,13 @@ class PlayState extends MusicBeatState
 
 		if (generatedMusic && SONG.notes[Std.int(curStep / 16)] != null)
 		{
-			/*
-				if (curBeat % 4 == 0)
-				{
-					trace(PlayState.SONG.notes[Std.int(curStep / 16)].mustHitSection);
-				}
-			*/
-
 			if (SONG.notes[Std.int(curStep / 16)].mustHitSection)
 			{
 				moveCamera();
-				/*
-					camFollow.setPosition(boyfriend.getMidpoint().x - 100, boyfriend.getMidpoint().y - 100);
-
-					switch (curStage)
-					{
-						case 'limo':
-							camFollow.x = boyfriend.getMidpoint().x - 300;
-						case 'mall':
-							camFollow.y = boyfriend.getMidpoint().y - 200;
-						case 'school':
-							camFollow.x = boyfriend.getMidpoint().x - 200;
-							camFollow.y = boyfriend.getMidpoint().y - 200;
-						case 'schoolEvil':
-							camFollow.x = boyfriend.getMidpoint().x - 200;
-							camFollow.y = boyfriend.getMidpoint().y - 200;
-					}
-
-					if (SONG.song.toLowerCase() == 'tutorial')
-					{
-						FlxTween.tween(FlxG.camera, {zoom: 1}, (Conductor.stepCrochet * 4 / 1000), {ease: FlxEase.elasticInOut});
-					}
-				*/
 			}
 			else
 			{
 				moveCamera(true);
-				/*
-					camFollow.setPosition(dad.getMidpoint().x + 150, dad.getMidpoint().y - 100);
-					// camFollow.setPosition(lucky.getMidpoint().x - 120, lucky.getMidpoint().y + 210);
-
-					switch (dad.curCharacter)
-					{
-						case 'mom':
-							camFollow.y = dad.getMidpoint().y;
-						case 'senpai':
-							camFollow.y = dad.getMidpoint().y - 430;
-							camFollow.x = dad.getMidpoint().x - 100;
-						case 'senpai-angry':
-							camFollow.y = dad.getMidpoint().y - 430;
-							camFollow.x = dad.getMidpoint().x - 100;
-					}
-
-					if (dad.curCharacter == 'mom')
-						vocals.volume = 1;
-
-					if (SONG.song.toLowerCase() == 'tutorial')
-					{
-						tweenCamIn();
-					}
-				*/
 			}
 		}
 
@@ -1343,11 +1290,6 @@ class PlayState extends MusicBeatState
 		{
 			resyncVocals();
 		}
-
-		if (rival.curCharacter == 'spooky' && curStep % 4 == 2)
-		{
-			// dad.dance();
-		}
 	}
 
 	override function beatHit()
@@ -1369,10 +1311,6 @@ class PlayState extends MusicBeatState
 			}
 			// else
 			// Conductor.changeBPM(SONG.bpm);
-
-			// Dad doesnt interupt his own notes
-			if (SONG.notes[Math.floor(curStep / 16)].mustHitSection)
-				rival.dance();
 		}
 		// FlxG.log.add('change bpm' + SONG.notes[Std.int(curStep / 16)].changeBPM);
 
@@ -1395,14 +1333,19 @@ class PlayState extends MusicBeatState
 		iconP1.updateHitbox();
 		iconP2.updateHitbox();
 
-		if (curBeat % gfSpeed == 0)
+		if (curBeat % gfSpeed == 0 && ! gf.animation.curAnim.name.startsWith("sing"))
 		{
 			gf.dance();
 		}
 
 		if (!boyfriend.animation.curAnim.name.startsWith("sing"))
 		{
-			boyfriend.playAnim('idle');
+			boyfriend.dance();
+		}
+
+		if (!rival.animation.curAnim.name.startsWith("sing"))
+		{
+			rival.dance();
 		}
 
 		if (curBeat % 8 == 7 && curSong == 'Bopeebo')

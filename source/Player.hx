@@ -104,6 +104,11 @@ class Player
         }
     }
 
+    /**
+        Function used by the player class to monitor inputs and respond to them accordingly.
+
+        Heavily based upon Psych code. Cred to those devs, they're awesome.
+     */
     private function onKeyPress(event:KeyboardEvent):Void 
     {
         var pressedKey:FlxKey = event.keyCode;
@@ -120,47 +125,58 @@ class Player
             }
         }
 
-        var pressNotes:Array<Note> = [];
-        var notesStopped:Bool = false;
-        var sortedNotesList:Array<Note> = [];
-
-        strumLine.notes.forEachAlive(function(daNote:Note)
+        if(!cpucontrolled && curLevel.startedCountdown && !curLevel.paused && key > -1 && FlxG.keys.checkStatus(pressedKey, JUST_PRESSED))
         {
-            if(daNote.canBeHit && !daNote.tooLate && !daNote.wasGoodHit && !daNote.isSustainNote)
-            {
-                if(daNote.noteData == key)
-                {
-                    sortedNotesList.push(daNote);
-                }
-            }
-        });
+            var pressNotes:Array<Note> = [];
+            var notesStopped:Bool = false;
+            var sortedNotesList:Array<Note> = [];
 
-        if(sortedNotesList.length > 0)
-        {
-            for (epicNote in sortedNotesList)
+            strumLine.notes.forEachAlive(function(daNote:Note)
             {
-                for (doubleNote in pressNotes) 
+                if(daNote.canBeHit && !daNote.tooLate && !daNote.wasGoodHit && !daNote.isSustainNote)
                 {
-                    if (Math.abs(doubleNote.strumTime - epicNote.strumTime) < 1) 
+                    if(daNote.noteData == key)
                     {
-                        doubleNote.kill();
-                        strumLine.notes.remove(doubleNote, true);
-                        doubleNote.destroy();
-                    } else
-                        notesStopped = true;
+                        sortedNotesList.push(daNote);
+                    }
                 }
+            });
 
-                if (!notesStopped) 
+            if(sortedNotesList.length > 0)
+            {
+                for (epicNote in sortedNotesList)
                 {
-                    strumLine.goodNoteHit(epicNote);
-                    pressNotes.push(epicNote);
-                }
+                    for (doubleNote in pressNotes) 
+                    {
+                        if (Math.abs(doubleNote.strumTime - epicNote.strumTime) < 1) 
+                        {
+                            doubleNote.kill();
+                            strumLine.notes.remove(doubleNote, true);
+                            doubleNote.destroy();
+                        } else
+                            notesStopped = true;
+                    }
 
+                    if (!notesStopped) 
+                    {
+                        strumLine.goodNoteHit(epicNote);
+                        pressNotes.push(epicNote);
+                    }
+
+                }
             }
+            else
+            {
+                strumLine.noteMissPress(key);
+            }
+
+            var spr:StrumLine.StrumNote = strumLine.strumLineNotes.members[key];
+			if(spr != null && spr.animation.curAnim.name != 'confirm')
+			{
+				spr.playAnim('pressed');
+				spr.resetAnim = 0;
+			}
         }
-        
-        // if(key > -1)
-            // trace("Pressed key " + keysArray[key][0].toString());
     }
 
 	private function onKeyRelease(event:KeyboardEvent):Void 
@@ -181,8 +197,7 @@ class Player
 
         if(curLevel.startedCountdown && !curLevel.paused && key > -1)
         {
-            // My, my...
-            strumLine.strumLineNotes.members[key].animation.play('static');
+            strumLine.strumLineNotes.members[key].playAnim('static');
         }
     }
 }
