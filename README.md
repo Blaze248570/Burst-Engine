@@ -82,11 +82,11 @@ Almost there! We just need to download a library using git. There's only a coupl
 For those of you familiar with Ninjamuffin's guide, he required a file called `APIStuff.hx`, but we're not connecting to Newgrounds, so that won't be necessary.
 
 ## Compiling the Game
-Once all of those dependencies are installed, just open up a command line in the project's directory, run `lime test [target]`, and you're good to go! ... if you're not compiling to desktop, that is.
+Once all of those dependencies are installed, just open up a command line in the project's directory, run `lime test html5`, and you're good to go! ... if you're not compiling to desktop, that is.
 
 For that, there's a bit of variation depending on your OS.
 
-**For Linux:** You'll simply need to add `lime test linux`. Pretty straight forward.
+**For Linux:** You'll simply need to switch it to `lime test linux`. Not too complicated.
 
 **For Windows:** You'll need to install Visual Studio Community 2019. While installing VSC, ignore the options to install any workloads. Instead, go to the individual components tab and choose the following:
 * MSVC v142 - VS 2019 C++ x64/x86 build tools

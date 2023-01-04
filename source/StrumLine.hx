@@ -73,6 +73,10 @@ class StrumLine
                 var daNote:StrumNote = strumLineNotes.members[i];
                 daNote.y -= 10;
                 FlxTween.tween(daNote, {y: daNote.y + 10, alpha: 1}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
+            } 
+            else 
+            {
+                strumLineNotes.members[i].alpha = 1; 
             }
         }
     }

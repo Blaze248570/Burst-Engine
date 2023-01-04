@@ -459,9 +459,10 @@ class PlayState extends MusicBeatState
 	/**
 		Function meant for subclasses to override when loading starting cutscenes.
 
-		WARNING: DO NOT call `super.startCutscene()` as it will cause the countdown to begin early!
+		WARNING: DO NOT call `super.startCutscene()` as it will cause the countdown to begin early, but also make sure `startCountdown()` is called!
 	*/
-	function startCutscene() {
+	function startCutscene():Void
+	{
 		startCountdown();
 	}
 
