@@ -12,8 +12,6 @@ import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 
-import levels.MasterLevel;
-
 using StringTools;
 
 class StoryMenuState extends MusicBeatState
@@ -243,29 +241,29 @@ class StoryMenuState extends MusicBeatState
 		{
 			if (!selectedWeek)
 			{
-				if (controls.UP_P)
+				if (controls.UI_UP_P)
 				{
 					changeWeek(-1);
 				}
 
-				if (controls.DOWN_P)
+				if (controls.UI_DOWN_P)
 				{
 					changeWeek(1);
 				}
 
-				if (controls.RIGHT)
+				if (controls.UI_RIGHT)
 					rightArrow.animation.play('press')
 				else
 					rightArrow.animation.play('idle');
 
-				if (controls.LEFT)
+				if (controls.UI_LEFT)
 					leftArrow.animation.play('press');
 				else
 					leftArrow.animation.play('idle');
 
-				if (controls.RIGHT_P)
+				if (controls.UI_RIGHT_P)
 					changeDifficulty(1);
-				if (controls.LEFT_P)
+				if (controls.UI_LEFT_P)
 					changeDifficulty(-1);
 			}
 
@@ -302,8 +300,8 @@ class StoryMenuState extends MusicBeatState
 				stopspamming = true;
 			}
 
-			MasterLevel.storyPlaylist = weekData[curWeek];
-			MasterLevel.isStoryMode = true;
+			PlayState.storyPlaylist = weekData[curWeek];
+			PlayState.isStoryMode = true;
 			selectedWeek = true;
 
 			var diffic = "";
@@ -316,11 +314,11 @@ class StoryMenuState extends MusicBeatState
 					diffic = '-hard';
 			}
 
-			MasterLevel.storyDifficulty = curDifficulty;
+			PlayState.storyDifficulty = curDifficulty;
 
-			MasterLevel.SONG = Song.loadFromJson(MasterLevel.storyPlaylist[0].toLowerCase() + diffic, MasterLevel.storyPlaylist[0].toLowerCase());
-			MasterLevel.storyWeek = curWeek;
-			MasterLevel.campaignScore = 0;
+			PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + diffic, PlayState.storyPlaylist[0].toLowerCase());
+			PlayState.storyWeek = curWeek;
+			PlayState.campaignScore = 0;
 			new FlxTimer().start(1, function(tmr:FlxTimer)
 			{
 				LoadingState.loadAndSwitchState(levels.LevelData.getLevel("week" + curWeek), true);

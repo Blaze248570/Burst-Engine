@@ -4,8 +4,6 @@ package;
 import Discord.DiscordClient;
 #end
 
-import levels.MasterLevel;
-
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.group.FlxGroup.FlxTypedGroup;
@@ -197,8 +195,8 @@ class FreeplayState extends MusicBeatState
 
 		scoreText.text = "PERSONAL BEST:" + lerpScore;
 
-		var upP = controls.UP_P;
-		var downP = controls.DOWN_P;
+		var upP = controls.UI_UP_P;
+		var downP = controls.UI_DOWN_P;
 		var accepted = controls.ACCEPT;
 
 		if (upP)
@@ -210,9 +208,9 @@ class FreeplayState extends MusicBeatState
 			changeSelection(1);
 		}
 
-		if (controls.LEFT_P)
+		if (controls.UI_LEFT_P)
 			changeDiff(-1);
-		if (controls.RIGHT_P)
+		if (controls.UI_RIGHT_P)
 			changeDiff(1);
 
 		if (controls.BACK)
@@ -226,12 +224,12 @@ class FreeplayState extends MusicBeatState
 
 			trace(poop);
 
-			MasterLevel.SONG = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
-			MasterLevel.isStoryMode = false;
-			MasterLevel.storyDifficulty = curDifficulty;
+			PlayState.SONG = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
+			PlayState.isStoryMode = false;
+			PlayState.storyDifficulty = curDifficulty;
 
-			MasterLevel.storyWeek = songs[curSelected].week;
-			trace('CUR WEEK' + MasterLevel.storyWeek);
+			PlayState.storyWeek = songs[curSelected].week;
+			trace('CUR WEEK' + PlayState.storyWeek);
 			// NOTE: Adjust for flexibility (Weeks that aren't literally called "week")
 			LoadingState.loadAndSwitchState(levels.LevelData.getLevel("week" + songs[curSelected].week));
 		}

@@ -5,12 +5,12 @@ import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 
-import levels.MasterLevel;
-
 using StringTools;
 
 class Note extends FlxSprite
 {
+	public var parentStrum:StrumLine;
+
 	public var strumTime:Float = 0;
 
 	public var mustPress:Bool = false;
@@ -44,7 +44,7 @@ class Note extends FlxSprite
 		this.strumTime = strumTime;
 		this.noteData = noteData;
 
-		switch (MasterLevel.curStage)
+		switch (PlayState.curStage)
 		{
 			case 'school' | 'schoolEvil':
 				loadGraphic(Paths.image('weeb/pixelUI/arrows-pixels'), true, 17, 17);
@@ -69,7 +69,7 @@ class Note extends FlxSprite
 					animation.add('bluehold', [1]);
 				}
 
-				setGraphicSize(Std.int(width * MasterLevel.daPixelZoom));
+				setGraphicSize(Std.int(width * PlayState.daPixelZoom));
 				updateHitbox();
 
 			default:
@@ -95,63 +95,24 @@ class Note extends FlxSprite
 				antialiasing = true;
 		}
 
-		switch (noteData)
-		{
-			case 0:
-				x += swagWidth * 0;
-				animation.play('purpleScroll');
-			case 1:
-				x += swagWidth * 1;
-				animation.play('blueScroll');
-			case 2:
-				x += swagWidth * 2;
-				animation.play('greenScroll');
-			case 3:
-				x += swagWidth * 3;
-				animation.play('redScroll');
-		}
+		var colors:Array<String> = ['purple', 'blue', 'green', 'red'];
+
+		animation.play(colors[noteData] + "Scroll");
 
 		if (isSustainNote && prevNote != null)
 		{
 			noteScore * 0.2;
 			alpha = 0.6;
 
-			x += width / 2;
-
-			switch (noteData)
-			{
-				case 2:
-					animation.play('greenholdend');
-				case 3:
-					animation.play('redholdend');
-				case 1:
-					animation.play('blueholdend');
-				case 0:
-					animation.play('purpleholdend');
-			}
+			animation.play(colors[noteData] + "holdend");
 
 			updateHitbox();
 
-			x -= width / 2;
-
-			if (MasterLevel.curStage.startsWith('school'))
-				x += 30;
-
 			if (prevNote.isSustainNote)
 			{
-				switch (prevNote.noteData)
-				{
-					case 0:
-						prevNote.animation.play('purplehold');
-					case 1:
-						prevNote.animation.play('bluehold');
-					case 2:
-						prevNote.animation.play('greenhold');
-					case 3:
-						prevNote.animation.play('redhold');
-				}
+				prevNote.animation.play(colors[noteData] + "hold");
 
-				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.5 * MasterLevel.SONG.speed;
+				prevNote.scale.y *= (Conductor.stepCrochet / 100 * 1.5 * PlayState.SONG.speed);
 				prevNote.updateHitbox();
 			}
 		}
@@ -164,24 +125,18 @@ class Note extends FlxSprite
 	{
 		super.update(elapsed);
 
-		if (mustPress)
+		if (!parentStrum.cpucontrolled)
 		{
 			// The * 0.5 is so that it's easier to hit them too late, instead of too early
-			if (strumTime > Conductor.songPosition - Conductor.safeZoneOffset
-				&& strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * 0.5))
-				canBeHit = true;
-			else
-				canBeHit = false;
+			canBeHit = (strumTime > Conductor.songPosition - Conductor.safeZoneOffset && strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * 0.5));
 
-			if (strumTime < Conductor.songPosition - Conductor.safeZoneOffset && !wasGoodHit)
-				tooLate = true;
+			tooLate = (strumTime < Conductor.songPosition - Conductor.safeZoneOffset && !wasGoodHit);
 		}
 		else
 		{
 			canBeHit = false;
 
-			if (strumTime <= Conductor.songPosition)
-				wasGoodHit = true;
+			wasGoodHit = (strumTime <= Conductor.songPosition);
 		}
 
 		if (tooLate)

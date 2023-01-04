@@ -6,8 +6,6 @@ import flixel.FlxState;
 
 import haxe.io.Path;
 
-import levels.MasterLevel;
-
 import lime.app.Promise;
 import lime.app.Future;
 import lime.utils.Assets as LimeAssets;
@@ -60,11 +58,11 @@ class LoadingState extends MusicBeatState
 				callbacks = new MultiCallback(onLoad);
 				var introComplete = callbacks.add("introComplete");
 				checkLoadSong(getSongPath());
-				if (MasterLevel.SONG.needsVoices)
+				if (PlayState.SONG.needsVoices)
 					checkLoadSong(getVocalPath());
 				checkLibrary("shared");
-				if (MasterLevel.storyWeek > 0)
-					checkLibrary("week" + MasterLevel.storyWeek);
+				if (PlayState.storyWeek > 0)
+					checkLibrary("week" + PlayState.storyWeek);
 				else
 					checkLibrary("tutorial");
 				
@@ -136,12 +134,12 @@ class LoadingState extends MusicBeatState
 	
 	static function getSongPath():String
 	{
-		return 'songs:assets/songs/${MasterLevel.SONG.song.toLowerCase()}/Inst.${Paths.SOUND_EXT}';
+		return 'songs:assets/songs/${PlayState.SONG.song.toLowerCase()}/Inst.${Paths.SOUND_EXT}';
 	}
 	
 	static function getVocalPath():String
 	{
-		return 'songs:assets/songs/${MasterLevel.SONG.song.toLowerCase()}/Voices.${Paths.SOUND_EXT}';
+		return 'songs:assets/songs/${PlayState.SONG.song.toLowerCase()}/Voices.${Paths.SOUND_EXT}';
 	}
 	
 	inline static public function loadAndSwitchState(target:FlxState, stopMusic = false)
@@ -151,10 +149,10 @@ class LoadingState extends MusicBeatState
 	
 	static function getNextState(target:FlxState, stopMusic = false):FlxState
 	{
-		Paths.setCurrentLevel("week" + MasterLevel.storyWeek);
+		Paths.setCurrentLevel("week" + PlayState.storyWeek);
 		#if NO_PRELOAD_ALL
 		var loaded = isSoundLoaded(getSongPath())
-			&& (!MasterLevel.SONG.needsVoices || isSoundLoaded(getVocalPath()))
+			&& (!PlayState.SONG.needsVoices || isSoundLoaded(getVocalPath()))
 			&& isLibraryLoaded("shared");
 		
 		if (!loaded)

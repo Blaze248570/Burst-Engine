@@ -7,13 +7,13 @@ import flixel.util.FlxTimer;
 // import openfl.display.BlendMode;
 // import openfl.filters.ShaderFilter;
 
-class Limo extends MasterLevel {
+class Limo extends PlayState {
     var limo:BGSprite;
 	var grpLimoDancers:FlxTypedGroup<BackgroundDancer>;
 	var fastCar:BGSprite;
 
     override public function createStage() {
-        MasterLevel.curStage = 'limo';
+        PlayState.curStage = 'limo';
         defaultCamZoom = 0.9;
         BF_POS.set(1030, -120);
 

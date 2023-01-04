@@ -7,8 +7,6 @@ import flixel.FlxObject;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 
-import levels.MasterLevel;
-
 class GameOverSubstate extends MusicBeatSubstate
 {
 	var bf:Boyfriend;
@@ -18,7 +16,7 @@ class GameOverSubstate extends MusicBeatSubstate
 
 	public function new(x:Float, y:Float)
 	{
-		var daStage = MasterLevel.curStage;
+		var daStage = PlayState.curStage;
 		var daBf:String = '';
 		switch (daStage)
 		{
@@ -66,7 +64,7 @@ class GameOverSubstate extends MusicBeatSubstate
 		{
 			FlxG.sound.music.stop();
 
-			if (MasterLevel.isStoryMode)
+			if (PlayState.isStoryMode)
 				FlxG.switchState(new StoryMenuState());
 			else
 				FlxG.switchState(new FreeplayState());
@@ -109,7 +107,7 @@ class GameOverSubstate extends MusicBeatSubstate
 			{
 				FlxG.camera.fade(FlxColor.BLACK, 2, false, function()
 				{
-					LoadingState.loadAndSwitchState(levels.LevelData.getLevel("week" + MasterLevel.storyWeek));
+					LoadingState.loadAndSwitchState(levels.LevelData.getLevel("week" + PlayState.storyWeek));
 				});
 			});
 		}

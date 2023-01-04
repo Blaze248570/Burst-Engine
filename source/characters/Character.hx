@@ -1,7 +1,5 @@
 package characters;
 
-import levels.MasterLevel;
-
 using StringTools;
 
 typedef AnimationData = {
@@ -28,6 +26,8 @@ class Character extends flixel.FlxSprite
 	public var holdTimer:Float = 0;
 
 	public var missAnimations:Array<Bool> = [false, false, false, false];
+
+	public var stunned:Bool = false;
 
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
 	{
@@ -122,7 +122,7 @@ class Character extends flixel.FlxSprite
 				flipX = !isPlayer;
 				antialiasing = false;
 
-				setGraphicSize(Std.int(width * MasterLevel.daPixelZoom));
+				setGraphicSize(Std.int(width * PlayState.daPixelZoom));
 				updateHitbox();
 
 				animationData = [
@@ -159,7 +159,7 @@ class Character extends flixel.FlxSprite
 				flipX = !isPlayer;
 				antialiasing = false;
 
-				setGraphicSize(Std.int(width * MasterLevel.daPixelZoom));
+				setGraphicSize(Std.int(width * PlayState.daPixelZoom));
 				updateHitbox();
 				
 				animationData = [
@@ -199,7 +199,7 @@ class Character extends flixel.FlxSprite
 				frames = Paths.getSparrowAtlas('weeb/gfPixel');
 				antialiasing = false;
 
-				setGraphicSize(Std.int(width * MasterLevel.daPixelZoom));
+				setGraphicSize(Std.int(width * PlayState.daPixelZoom));
 				updateHitbox();
 
 				animationData = [
@@ -310,7 +310,7 @@ class Character extends flixel.FlxSprite
 				frames = Paths.getSparrowAtlas('weeb/senpai');
 				antialiasing = false;
 	
-				setGraphicSize(Std.int(width * MasterLevel.daPixelZoom));
+				setGraphicSize(Std.int(width * PlayState.daPixelZoom));
 				updateHitbox();
 
 				animationData = (curCharacter == 'senpai-angry') 
@@ -338,7 +338,7 @@ class Character extends flixel.FlxSprite
 				frames = Paths.getPackerAtlas('weeb/spirit');
 				antialiasing = false;
 
-				setGraphicSize(Std.int(width * MasterLevel.daPixelZoom));
+				setGraphicSize(Std.int(width * PlayState.daPixelZoom));
 				updateHitbox();
 
 				animationData = [
@@ -407,23 +407,26 @@ class Character extends flixel.FlxSprite
 
 	override function update(elapsed:Float)
 	{
-		if (!curCharacter.startsWith('bf'))
-		{
-			if (animation.curAnim.name.startsWith('sing'))
+		/*
+			if (!curCharacter.startsWith('bf'))
 			{
-				holdTimer += elapsed;
-			}
+				if (animation.curAnim.name.startsWith('sing'))
+				{
+					holdTimer += elapsed;
+				}
 
-			var dadVar:Float = 4;
+				var dadVar:Float = 4;
 
-			if (curCharacter == 'dad')
-				dadVar = 6.1;
-			if (holdTimer >= Conductor.stepCrochet * dadVar * 0.001)
-			{
-				dance();
-				holdTimer = 0;
+				if (curCharacter == 'dad')
+					dadVar = 6.1;
+
+				if (holdTimer >= Conductor.stepCrochet * dadVar * 0.001)
+				{
+					dance();
+					holdTimer = 0;
+				}
 			}
-		}
+		*/
 
 		switch (curCharacter)
 		{

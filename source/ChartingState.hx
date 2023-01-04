@@ -21,8 +21,6 @@ import flixel.util.FlxColor;
 
 import haxe.Json;
 
-import levels.MasterLevel;
-
 import Section.SwagSection;
 import Song.SwagSong;
 
@@ -106,8 +104,8 @@ class ChartingState extends MusicBeatState
 		curRenderedNotes = new FlxTypedGroup<Note>();
 		curRenderedSustains = new FlxTypedGroup<FlxSprite>();
 
-		if (MasterLevel.SONG != null)
-			_song = MasterLevel.SONG;
+		if (PlayState.SONG != null)
+			_song = PlayState.SONG;
 		else
 		{
 			_song = {
@@ -542,10 +540,10 @@ class ChartingState extends MusicBeatState
 		{
 			lastSection = curSection;
 
-			MasterLevel.SONG = _song;
+			PlayState.SONG = _song;
 			FlxG.sound.music.stop();
 			vocals.stop();
-			FlxG.switchState(new MasterLevel());
+			FlxG.switchState(new PlayState());
 		}
 
 		if (FlxG.keys.justPressed.E)
@@ -1016,13 +1014,13 @@ class ChartingState extends MusicBeatState
 
 	function loadJson(song:String):Void
 	{
-		MasterLevel.SONG = Song.loadFromJson(song.toLowerCase(), song.toLowerCase());
+		PlayState.SONG = Song.loadFromJson(song.toLowerCase(), song.toLowerCase());
 		FlxG.resetState();
 	}
 
 	function loadAutosave():Void
 	{
-		MasterLevel.SONG = Song.parseJSONshit(FlxG.save.data.autosave);
+		PlayState.SONG = Song.parseJSONshit(FlxG.save.data.autosave);
 		FlxG.resetState();
 	}
 
